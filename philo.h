@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/02 11:36:54 by adesille         ###   ########.fr       */
+/*   Updated: 2024/07/02 13:19:22 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,18 @@ typedef struct s_memman
 
 typedef struct s_philo
 {
+	pthread_t		ph;
+	struct s_philo	*next;
+}					t_philo;
+
+typedef struct s_init
+{
 	int				nbr_of_philo;
 	int				dying_time;
 	int				eating_time;
 	int				sleeping_time;
 	int				eating_right_time;
-}					t_philo;
+}					t_init;
 
 void				*mem_manager(size_t size, void *ptr, int token);
 int					ft_atoi(const char *nptr);

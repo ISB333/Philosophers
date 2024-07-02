@@ -6,7 +6,7 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/07/02 11:29:08 by adesille         ###   ########.fr        #
+#    Updated: 2024/07/02 11:49:23 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,10 @@ DEPFILES = $(SRCS:%c=$(OBJ_DIR)/%.o)
 OBJ_DIR = .obj
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
-######################## VALGRIND ########################
+######################## UTILS ########################
+
+GREEN = \033[0;92m
+CURRENT_DATE	:= $(shell date +"%Y-%m-%d %H:%M")
 
 VALGRIND = valgrind -s --leak-check=full --track-origins=yes --track-fds=yes --show-leak-kinds=all --suppressions=valgrind.supp --quiet ./minishell
 
@@ -60,6 +63,12 @@ fclean : clean
 	@rm -f $(NAME)
 
 re : fclean all
+
+git:
+	@git add . > /dev/null 2>&1
+	@git commit -m "$(CURRENT_DATE)" > /dev/null 2>&1
+	@git push > /dev/null 2>&1
+	@echo "$(GREEN)┌(メ▼▼)┘ GIT UPDATE └(▼▼メ)┐ $(DEF_COLOR)"
 
 -include $(DEPFILES)
 

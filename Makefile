@@ -6,7 +6,7 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/07/02 10:03:37 by adesille         ###   ########.fr        #
+#    Updated: 2024/07/02 11:29:08 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,17 +24,14 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = main.c
+SRCS = main.c ./srcs/utils.c \
+	./srcs/memory_manager.c ./srcs/memory_manager_utils.c
 
 DEPFILES = $(SRCS:%c=$(OBJ_DIR)/%.o)
-OFLAGS += -Wall -Wextra -g3 -I.
 OBJ_DIR = .obj
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
-######################## LIBRARY ########################
-
-LIBFT_DIR = ./libft
-LIBFT = $(LIBFT_DIR)/libft.a
+######################## VALGRIND ########################
 
 VALGRIND = valgrind -s --leak-check=full --track-origins=yes --track-fds=yes --show-leak-kinds=all --suppressions=valgrind.supp --quiet ./minishell
 
@@ -50,20 +47,13 @@ $(OBJ_DIR)/%.o : %.c
 	@if [ ! -d .obj/srcs ]; then \
 	    echo "$(WHITE)\nCompiling Philosophers files...$(DEFAULT)"; \
 	fi
-	@$(CC) $(OFLAGS) -c $< -o $@
-
-$(LIBFT) :
-	@if [ ! -f $(LIBFT)/*.o ]; then \
-	    echo "$(RED)\nCompiling libft files...$(DEFAULT)\n"; \
-	fi
-	@$(MAKE) -C $(LIBFT_DIR) --no-print-directory
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 val :
 	@$(VALGRIND)
 
 clean :
 	@rm -rf $(OBJ_DIR) $(DEPFILES)
-	@$(MAKE) -C $(LIBFT_DIR) fclean --no-print-directory
 	@echo "$(BLUE)\nEvery files are cleaned$(DEFAULT)"
 
 fclean : clean

@@ -6,14 +6,14 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/07/02 08:47:55 by adesille         ###   ########.fr        #
+#    Updated: 2024/07/02 10:03:37 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 ######################## ARGUMENTS ########################
 
 NAME = philo
-CFLAGS += -Wall -Wextra -MP -MD -g3 -I.
+CFLAGS += -Wall -Wextra -MP -MD -g3 -I. -pthread
 CC = cc 
 
 DEFAULT = \033[0;39m

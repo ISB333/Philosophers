@@ -6,14 +6,28 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/02 15:30:54 by adesille         ###   ########.fr       */
+/*   Updated: 2024/07/03 11:11:59 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/*
+	fork = nbr_of_philo / 2 (1 if 1 nbr_of_philo)
+	- each philosopher has a fork on their left and their right
+	- To prevent philosophers from duplicating forks, 
+		you should protect the forks state with a mutex for each of them
+
+	? To return a value, we should malloc an int * to store the value we want to return, then cast it to (void *)
+	e.g :
+		if (pthread_join(th, (void**) &res) != 0)
+		*in the routine*:
+		*result = value;
+		return (void*) result;
+
+*/
+
 int				mails = 0;
-// pthread_mutex_t	mutex;
 
 void	*routine(void *arg)
 {

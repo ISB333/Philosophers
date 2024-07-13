@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
+/*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/02 13:19:22 by adesille         ###   ########.fr       */
+/*   Updated: 2024/07/13 07:15:05 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@
 # include <string.h>
 # include <sys/time.h>
 # include <unistd.h>
+
+# define RED "\033[0;31m"
+# define BLUE "\033[0;34m"
+# define DEF "\033[0m"
 
 typedef struct s_memman
 {
@@ -46,5 +50,6 @@ int					ft_atoi(const char *nptr);
 size_t				ft_strlen(const char *str);
 void				*ff(t_memman *mem_list);
 char				*ft_strjoin(char const *s1, char const *s2);
+int					error(char *msg);
 
 #endif

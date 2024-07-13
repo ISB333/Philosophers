@@ -3,21 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
+/*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/03 11:11:59 by adesille         ###   ########.fr       */
+/*   Updated: 2024/07/13 07:18:40 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 /*
-	fork = nbr_of_philo / 2 (1 if 1 nbr_of_philo)
-	- each philosopher has a fork on their left and their right
-	- To prevent philosophers from duplicating forks, 
-		you should protect the forks state with a mutex for each of them
-
 	? To return a value, we should malloc an int * to store the value we want to return, then cast it to (void *)
 	e.g :
 		if (pthread_join(th, (void**) &res) != 0)
@@ -25,6 +20,21 @@
 		*result = value;
 		return (void*) result;
 
+	* 1- Philosophers eat with right & left forks
+	* 2- Finished eating, put his forks back on the table
+	* 3- Sleep
+	* 4- Wake-up & Think
+
+	! Conditions :
+		! - fork = nbr_of_philo / 2 (1 if 1 nbr_of_philo)
+		! - Each philosopher has a fork on their left and their right
+		! - Each philosopher has a number from 1 to nbr_of_philo
+			! -> Philo 1 sits next to nbr_of_philo
+		! - To prevent philosophers from duplicating forks, 
+			! you should protect the forks state with a mutex for each of them
+		! - They should never die starving
+		! - They don't speak to each other
+		! - They don't know if another is about to die
 */
 
 int				mails = 0;
@@ -34,7 +44,7 @@ void	*routine(void *arg)
 	pthread_mutex_t *mutex;
 
 	mutex = arg;
-	for (int i = 0; i < 100000; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		pthread_mutex_lock(mutex);
 		mails++;
@@ -116,6 +126,6 @@ int	main(int argc, char *argv[])
 		thread_maker(i, &mutex);
 	}
 	else
-		return (printf("wrong number of arguments\n"), 1);
+		return (error("wrong number of arguments\n"), 1);
 	return (0);
 }

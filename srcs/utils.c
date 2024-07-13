@@ -3,14 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
+/*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 12:09:02 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/02 11:37:39 by adesille         ###   ########.fr       */
+/*   Updated: 2024/07/13 07:13:50 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int error(char *msg)
+{
+	msg = ft_strjoin(ft_strjoin(RED, msg), DEF);
+	return (write(2, msg, ft_strlen(msg)));
+}
 
 size_t  ft_strlcpy(char *dst, const char *src, size_t size)
 {

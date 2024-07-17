@@ -1,5 +1,5 @@
-.obj/./srcs/utils.o: srcs/utils.c /usr/include/stdc-predef.h philo.h \
- /usr/include/pthread.h /usr/include/features.h \
+.obj/./srcs/utils/utils.o: srcs/utils/utils.c /usr/include/stdc-predef.h \
+ philo.h /usr/include/pthread.h /usr/include/features.h \
  /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/bits/timesize.h \

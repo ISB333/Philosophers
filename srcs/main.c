@@ -6,7 +6,7 @@
 /*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/13 07:18:40 by isb3             ###   ########.fr       */
+/*   Updated: 2024/07/17 10:53:47 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,93 +37,78 @@
 		! - They don't know if another is about to die
 */
 
-int				mails = 0;
-
-void	*routine(void *arg)
+void	*philosopher(void *num)
 {
-	pthread_mutex_t *mutex;
+	struct timeval current_time;
+	t_philo	*ph;
+	int	left;
+	int	right;
 
-	mutex = arg;
-	for (int i = 0; i < 100; i++)
+	ph = (t_philo *)num;
+	gettimeofday(&current_time, NULL);
+	ph->dying_time = current_time.tv_usec + ph->i.true_dying_time;
+	while (1)
 	{
-		pthread_mutex_lock(mutex);
-		mails++;
-		pthread_mutex_unlock(mutex);
-		// read mails
-		// increment
-		// write mails
+		gettimeofday(&current_time, NULL);
+		if (current_time.tv_usec >= ph->dying_time)
+		{
+			printf(RED"Philosopher %d is DEAD.\n"DEF, ph->id);
+			break ;
+		}
+		printf("Philosopher %d is thinking.\n", ph->id);
+		left = ph->id;
+		right = (ph->id + 1) % ph->f.nbr_of_philo;
+
+		pthread_mutex_lock(&ph->f.forks[left]);
+		pthread_mutex_lock(&ph->f.forks[right]);
+		gettimeofday(&current_time, NULL);
+		ph->dying_time = current_time.tv_usec + ph->i.true_dying_time;
+		printf(BLUE"philo %d dying time = %ld\n"DEF, ph->id, ph->dying_time);
+		printf(GREEN"time of the day %ld\n"DEF, current_time.tv_usec);
+		printf("Philosopher %d is eating.\n", ph->id);
+		usleep(ph->i.eating_time);
+		// sleep(1);
+	
+		pthread_mutex_unlock(&ph->f.forks[left]);
+		pthread_mutex_unlock(&ph->f.forks[right]);
+		printf("Philosopher %d is sleeping.\n", ph->id);
+		usleep(ph->i.sleeping_time);
+		// sleep(1);
 	}
 	return (NULL);
 }
 
-void	parsing(t_init **i, char *argv[])
-{
-	*i = mem_manager(sizeof(t_init), 0, 'A');
-	(*i)->nbr_of_philo = ft_atoi(argv[1]);
-	(*i)->dying_time = ft_atoi(argv[2]);
-	(*i)->eating_time = ft_atoi(argv[3]);
-	(*i)->sleeping_time = ft_atoi(argv[4]);
-	if (argv[5])
-		(*i)->eating_right_time = ft_atoi(argv[5]);
-}
-
-int	init_philo(t_philo **p, pthread_mutex_t *mutex)
-{
-	t_philo	*new_node;
-	t_philo	*last_node;
-
-	new_node = malloc(sizeof(t_philo));
-	if (!new_node)
-		return (mem_manager(0, 0, 'C'), 1);
-	new_node->next = NULL;
-	if (pthread_create(&new_node->ph, NULL, &routine, mutex))
-		return (1);
-	if (!*p)
-		*p = new_node;
-	else
-	{
-		last_node = *p;
-		while (last_node->next)
-			last_node = last_node->next;
-		last_node->next = new_node;
-	}
-	return (0);
-}
-
-int	joiner(t_philo *p)
-{
-	while (p)
-	{
-		if (pthread_join(p->ph, NULL) != 0)
-			return (1);
-		p = p->next;
-	}
-	return (0);
-}
-
-int	thread_maker(t_init *i, pthread_mutex_t *mutex)
+int	thread_maker(t_init i)
 {
 	t_philo	*p;
+	t_forks f;
+	int k = -1;
 
 	p = NULL;
-	while (i->nbr_of_philo--)
-		if (init_philo(&p, mutex))
+	f.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), 0, 'A');
+	f.nbr_of_philo = i.nbr_of_philo;
+	while (++k < i.nbr_of_philo)
+		if (pthread_mutex_init(&f.forks[k], NULL))
 			return (1);
+	k = -1;
+	while (++k < i.nbr_of_philo)
+	{
+		if (init_philo(&p, k, f, i))
+			return (1);
+	}
 	joiner(p);
-	pthread_mutex_destroy(mutex);
-	printf("Number of mails: %d\n", mails);
+	// pthread_mutex_destroy(f.forks);
 	return (0);
 }
 
 int	main(int argc, char *argv[])
 {
-	t_init	*i;
+	t_init	i;
 
-	static pthread_mutex_t	mutex;
 	if (argc == 5 || argc == 6)
 	{
 		parsing(&i, argv);
-		thread_maker(i, &mutex);
+		thread_maker(i);
 	}
 	else
 		return (error("wrong number of arguments\n"), 1);

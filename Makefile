@@ -6,7 +6,7 @@
 #    By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/07/13 07:06:50 by isb3             ###   ########.fr        #
+#    Updated: 2024/07/17 10:12:06 by isb3             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,12 +24,16 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = main.c ./srcs/utils.c \
-	./srcs/memory_manager.c ./srcs/memory_manager_utils.c
+SRCS = ./srcs/main.c ./srcs/init.c
 
-DEPFILES = $(SRCS:%c=$(OBJ_DIR)/%.o)
+UTILS =./srcs/utils/utils.c \
+	./srcs/utils/memory_manager.c ./srcs/utils/memory_manager_utils.c
+
+DEPFILES = $(SRCS:%c=$(OBJ_DIR)/%.o) \
+		$(UTILS:%c=$(OBJ_DIR)/%.o)
 OBJ_DIR = .obj
-OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
+OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) \
+		$(UTILS:%.c=$(OBJ_DIR)/%.o)
 
 ######################## UTILS ########################
 

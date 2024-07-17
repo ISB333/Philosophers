@@ -6,7 +6,7 @@
 /*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/13 07:15:05 by isb3             ###   ########.fr       */
+/*   Updated: 2024/07/17 10:54:20 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,17 @@
 
 # define RED "\033[0;31m"
 # define BLUE "\033[0;34m"
+# define GREEN "\033[0;32m"
 # define DEF "\033[0m"
+
+typedef struct s_init
+{
+	int				nbr_of_philo;
+	long			true_dying_time;
+	int				eating_time;
+	int				sleeping_time;
+	int				eating_right_time;
+}					t_init;
 
 typedef struct s_memman
 {
@@ -30,20 +40,30 @@ typedef struct s_memman
 	struct s_memman	*next;
 }					t_memman;
 
+typedef struct s_forks
+{
+	int				nbr_of_philo;
+	pthread_mutex_t	*forks;
+}					t_forks;
+
 typedef struct s_philo
 {
-	pthread_t		ph;
+	pthread_t		philo;
+	long			dying_time;
+	t_forks			f;
+	t_init			i;
+	int				id;
 	struct s_philo	*next;
 }					t_philo;
 
-typedef struct s_init
-{
-	int				nbr_of_philo;
-	int				dying_time;
-	int				eating_time;
-	int				sleeping_time;
-	int				eating_right_time;
-}					t_init;
+/// SRCS ///
+
+void				*philosopher(void *num);
+int					init_philo(t_philo **p, int id, t_forks f, t_init i);
+void				parsing(t_init *i, char *argv[]);
+int					joiner(t_philo *p);
+
+/// UTILS ///
 
 void				*mem_manager(size_t size, void *ptr, int token);
 int					ft_atoi(const char *nptr);

@@ -6,7 +6,7 @@
 /*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/17 10:54:20 by isb3             ###   ########.fr       */
+/*   Updated: 2024/07/18 08:46:39 by isb3             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ typedef struct s_forks
 {
 	int				nbr_of_philo;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	state_mutex;
+	pthread_cond_t	state_cond;
 }					t_forks;
 
 typedef struct s_philo
@@ -58,7 +60,7 @@ typedef struct s_philo
 
 /// SRCS ///
 
-void				*philosopher(void *num);
+void				*philo_diner_table(void *num);
 int					init_philo(t_philo **p, int id, t_forks f, t_init i);
 void				parsing(t_init *i, char *argv[]);
 int					joiner(t_philo *p);

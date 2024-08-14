@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/06 12:30:17 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/14 12:00:16 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,114 +38,79 @@
 		! - They don't know if another is about to die
 */
 
-static	int is_philo_dead(int n)
+long	print_n_update(char *s, int n, struct timeval *current_time, int token)
 {
-	static int y_or_no = 0;
-
-	if (n)
-		y_or_no = 1;
-	return (y_or_no);
-}
-
-void	*unlocker(void **m)
-{
-	int i = -1;
-
-	while (m[++i])
-		pthread_mutex_unlock((pthread_mutex_t *)m[i]);
-	return (NULL);
-}
-
-void	*sleeping_time(t_philo *ph)
-{
-	pthread_mutex_lock(&ph->f.state_mutex);
-	if (is_philo_dead(0))
-		return (unlocker((void *[]){&ph->f.state_mutex, NULL}));
-	pthread_mutex_unlock(&ph->f.state_mutex);
-
-	printf("Philosopher %d is sleeping.\n", ph->id);
-	usleep(ph->i.sleeping_time);
-
-	pthread_mutex_lock(&ph->f.state_mutex);
-	if (is_philo_dead(0))
-		return (unlocker((void *[]){&ph->f.state_mutex, NULL}));
-	pthread_mutex_unlock(&ph->f.state_mutex);
-	return ("YES");
-}
-
-void	*eating_time(t_philo *ph, struct timeval *current_time)
-{
-	int	left;
-	int	right;
-
-	printf("Philosopher %d is thinking.\n", ph->id);
-	left = ph->id;
-	right = (ph->id + 1) % ph->f.nbr_of_philo;
-	pthread_mutex_lock(&ph->f.forks[left]);
-	pthread_mutex_lock(&ph->f.forks[right]);
-	
-	// printf(BLUE"philo %d dying time = %ld\n"DEF, ph->id, ph->dying_time);
-	pthread_mutex_lock(&ph->f.state_mutex);
-	if (is_philo_dead(0))
-		return (unlocker((void *[]){&ph->f.state_mutex, &ph->f.forks[left],
-				&ph->f.forks[right], NULL}));
+	long precise_time;
 	gettimeofday(current_time, NULL);
-	ph->dying_time = (*current_time).tv_usec + ph->i.true_dying_time;
-	pthread_mutex_unlock(&ph->f.state_mutex);
-
-	// printf(GREEN"time of the day %ld\n"DEF, current_time.tv_usec);
-	printf("Philosopher %d is eating.\n", ph->id);
-	usleep(ph->i.eating_time);
-	unlocker((void *[]){&ph->f.forks[left], &ph->f.forks[right], NULL});
-	return ("YES");
+	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec / 1000);
+	if (s)
+	{
+		// if (THINK)
+			// printf(de
+		if (token == EAT)
+			printf(GREEN);
+		if (token == SLEEP)
+			printf(BLUE);
+		if (token == DIE)
+			printf(RED);
+		if (token == LEFT_FORK)
+			printf(YELLOW);
+		if (token == RIGHT_FORK)
+			printf(YELLOW);
+			// printf(ORANGE);
+		printf("%ld %d %s\n", precise_time, n, s);
+		printf(DEF);
+	}
+	return (precise_time);
 }
+
+void set_philo_dead(t_philo *ph)
+{
+    pthread_mutex_lock(&ph->manager.mutex);
+    ph->manager.any_philo_dead = 1;
+    pthread_cond_broadcast(&ph->manager.cond); // Notify all threads
+    pthread_mutex_unlock(&ph->manager.mutex);
+}
+
 
 void	*philo_diner_table(void *num)
 {
 	struct timeval current_time;
+	long	precise_time;
 	t_philo	*ph;
 
 	ph = (t_philo *)num;
 	gettimeofday(&current_time, NULL);
-	ph->dying_time = current_time.tv_usec + ph->i.true_dying_time;
+	ph->dying_time = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000) + (ph->i.true_dying_time);
 	while (1)
 	{
-		pthread_mutex_lock(&ph->f.state_mutex);
-        if (is_philo_dead(0))
-			return (unlocker((void *[]){&ph->f.state_mutex, NULL}));
-        pthread_mutex_unlock(&ph->f.state_mutex);
-	
-		if (!is_philo_dead(0) && !eating_time(ph, &current_time))
-			return (NULL);
-	
-		if (!is_philo_dead(0) && !sleeping_time(ph))
-			return (NULL);
+		pthread_mutex_lock(&ph->state_mutex);
+        while (ph->is_dead) {
+            pthread_mutex_unlock(&ph->state_mutex);
+            return NULL; // Exit if any philosopher is dead
+        }
+        pthread_mutex_unlock(&ph->state_mutex);
 
-		pthread_mutex_lock(&ph->f.state_mutex);
-		gettimeofday(&current_time, NULL);
-		long current_time_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
-		if (current_time_ms >= ph->dying_time && !is_philo_dead(0))
-		{
-			// pthread_mutex_lock(&ph->f.state_mutex);
-			pthread_cond_broadcast(&ph->f.state_cond);
-			is_philo_dead(1);
-			unlocker((void *[]){&ph->f.state_mutex, NULL});
-			printf(RED"Philosopher %d is DEAD.\n"DEF, ph->id);
+		// if (is_philo_dead(0, ph))
+		// 	return (pthread_mutex_unlock(&ph->f.state_mutex), NULL);
+		if (!eating_time(ph, &current_time) || !sleeping_time(ph, &current_time))
 			return (NULL);
-			// return (unlocker((void *[]){&ph->f.state_mutex, NULL}));
+			// return (pthread_mutex_unlock(&ph->f.state_mutex), NULL);
+
+		pthread_mutex_lock(&ph->state_mutex);
+		precise_time = print_n_update(0, 0, &current_time, 0);
+		if (precise_time >= ph->dying_time)
+		{
+			// is_philo_dead(1, ph);
+			set_philo_dead(ph);
+			print_n_update("died", ph->id, &current_time, DIE);
+			unlocker((void *[]){&ph->state_mutex, NULL});
+			return (NULL);
 		}
-        pthread_mutex_unlock(&ph->f.state_mutex);
+        pthread_mutex_unlock(&ph->state_mutex);
 	}
 	return (NULL);
 }
-
-// void monitor_philosophers(t_forks *f) {
-//     pthread_mutex_lock(&f->state_mutex);
-//     while (!is_philo_dead(0)) {
-//         pthread_cond_wait(&f->state_cond, &f->state_mutex);
-//     }
-//     pthread_mutex_unlock(&f->state_mutex);
-// }
 
 int	thread_maker(t_init i)
 {
@@ -154,24 +119,24 @@ int	thread_maker(t_init i)
 	int k = -1;
 
 	p = NULL;
+    pthread_cond_init(&man.cond, NULL);
+
 	f.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), 0, 'A');
 	f.nbr_of_philo = i.nbr_of_philo;
 	while (++k < i.nbr_of_philo)
 		if (pthread_mutex_init(&f.forks[k], NULL))
 			return (1);
 	k = -1;
-	pthread_mutex_init(&f.state_mutex, NULL);
-	pthread_cond_init(&f.state_cond, NULL);
+	pthread_mutex_init(&state_mutex, NULL);
 	while (++k < i.nbr_of_philo)
 	{
-		if (init_philo(&p, k, f, i))
+		if (init_philo(&p, k, f, i, man))
 			return (1);
 	}
-	// monitor_philosophers(&f);
 	joiner(p);
 
     pthread_mutex_destroy(&f.state_mutex);
-    pthread_cond_destroy(&f.state_cond);
+	pthread_cond_destroy(&man.cond);
 
 	return (0);
 }

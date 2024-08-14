@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+         #
+#    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/07/17 10:12:06 by isb3             ###   ########.fr        #
+#    Updated: 2024/08/14 09:42:56 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = ./srcs/main.c ./srcs/init.c
+SRCS = ./srcs/main.c ./srcs/init.c ./srcs/activities.c
 
 UTILS =./srcs/utils/utils.c \
 	./srcs/utils/memory_manager.c ./srcs/utils/memory_manager_utils.c

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/07/18 08:46:31 by isb3             ###   ########.fr       */
+/*   Updated: 2024/08/14 12:00:58 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	parsing(t_init *i, char *argv[])
 {
 	(*i).nbr_of_philo = ft_atoi(argv[1]);
-	(*i).true_dying_time = (long)ft_atoi(argv[2]) * 1000 ;
+	(*i).true_dying_time = (long)ft_atoi(argv[2]);
 	(*i).eating_time = (long)ft_atoi(argv[3]) * 1000;
 	(*i).sleeping_time = (long)ft_atoi(argv[4]) * 1000;
 	if (argv[5])
@@ -34,6 +34,7 @@ int	init_philo(t_philo **p, int id, t_forks f, t_init i)
 	new_node->id = id;
 	new_node->f = f;
 	new_node->i = i;
+	pthread_cond_init(&new_node->cond, NULL);
 	if (pthread_create(&new_node->philo, NULL, &philo_diner_table, new_node))
 		return (1);
 	if (!*p)

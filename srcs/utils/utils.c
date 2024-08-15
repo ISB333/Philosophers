@@ -3,48 +3,48 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: isb3 <isb3@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/20 12:09:02 by adesille          #+#    #+#             */
-/*   Updated: 2024/07/13 07:13:50 by isb3             ###   ########.fr       */
+/*   Updated: 2024/08/15 11:26:30 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int error(char *msg)
+int	error(char *msg)
 {
 	msg = ft_strjoin(ft_strjoin(RED, msg), DEF);
 	return (write(2, msg, ft_strlen(msg)));
 }
 
-size_t  ft_strlcpy(char *dst, const char *src, size_t size)
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-        size_t  src_len;
+	size_t	src_len;
 
-        src_len = ft_strlen(src);
-        if (!size)
-                return (src_len);
-        while (*src && --size)
-                *dst++ = *src++;
-        *dst = '\0';
-        return (src_len);
+	src_len = ft_strlen(src);
+	if (!size)
+		return (src_len);
+	while (*src && --size)
+		*dst++ = *src++;
+	*dst = '\0';
+	return (src_len);
 }
 
-char    *ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-        char    *str;
-        int             len;
+	char	*str;
+	int		len;
 
-        if (s1 == NULL || s2 == NULL)
-                return (NULL);
-        len = ft_strlen(s1) + ft_strlen(s2) + 1;
-        str = mem_manager(len * sizeof(char), 0, 'A');
-        if (str == NULL)
-                return (NULL);
-        ft_strlcpy(str, s1, (ft_strlen(s1) + 1));
-        ft_strlcpy(&str[ft_strlen(s1)], s2, (ft_strlen(s2) + 1));
-        return (str);
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	str = mem_manager(len * sizeof(char), 0, 'A');
+	if (str == NULL)
+		return (NULL);
+	ft_strlcpy(str, s1, (ft_strlen(s1) + 1));
+	ft_strlcpy(&str[ft_strlen(s1)], s2, (ft_strlen(s2) + 1));
+	return (str);
 }
 
 size_t	ft_strlen(const char *str)

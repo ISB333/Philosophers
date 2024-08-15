@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/14 11:58:10 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/15 11:51:37 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,15 +55,20 @@ typedef struct s_forks
 	pthread_mutex_t	*forks;
 }					t_forks;
 
+typedef struct s_lock
+{
+	int				is_dead;
+	pthread_mutex_t	state_mutex;
+	pthread_cond_t	cond;
+}					t_lock;
+
 typedef struct s_philo
 {
 	pthread_t		philo;
 	long			dying_time;
-	int				is_dead;
-	pthread_mutex_t	state_mutex;
-	pthread_cond_t	cond;
 	t_forks			f;
 	t_init			i;
+	t_lock			l;
 	int				id;
 	struct s_philo	*next;
 }					t_philo;
@@ -71,13 +76,13 @@ typedef struct s_philo
 /// SRCS ///
 
 void				*philo_diner_table(void *num);
-int					init_philo(t_philo **p, int id, t_forks f, t_init i,
-						t_philo_manager man);
+int					init_philo(t_philo **p, int id, void **hax);
 void				parsing(t_init *i, char *argv[]);
 int					joiner(t_philo *p);
 void				*eating_time(t_philo *ph, struct timeval *current_time);
 void				*sleeping_time(t_philo *ph, struct timeval *current_time);
-int					is_philo_dead(int n, t_philo *ph);
+int is_one_dead(t_philo *ph);
+// int					is_philo_dead(int n, t_philo *ph);
 void				*unlocker(void **m);
 long				print_n_update(char *s, int n, struct timeval *current_time,
 						int token);

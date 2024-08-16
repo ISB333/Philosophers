@@ -6,23 +6,19 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/15 13:34:54 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/16 13:40:42 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-/*
-	Loots of shit I think
-
-	- DO I need 1 mutex for every thread? or 1 for all?
-	- DO I need 1 cond for every thread? or 1 for all?
-*/
-
-long	print_n_update(char *s, int n, struct timeval *current_time, int token)
+long	print_n_update(t_philo *ph, char *s, int n, struct timeval *current_time, int token)
 {
 	long	precise_time;
 
+	pthread_mutex_lock(&ph->l.print_mutex);
+	// if (is_he_dead(ph, 0))
+	// 	return (pthread_mutex_unlock(&ph->l.print_mutex), 0);
 	gettimeofday(current_time, NULL);
 	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
 			/ 1000);
@@ -44,27 +40,17 @@ long	print_n_update(char *s, int n, struct timeval *current_time, int token)
 		printf("%ld %d %s\n", precise_time, n, s);
 		printf(DEF);
 	}
+	pthread_mutex_unlock(&ph->l.print_mutex);
 	return (precise_time);
 }
 
-// int	is_one_dead(t_philo *ph)
-// {
-// 	pthread_mutex_lock(&ph->l.state_mutex);
-// 	if (ph->l.is_dead)
-// 		// return (1);
-// 		return (pthread_mutex_unlock(&ph->l.state_mutex), 1);
-// 	pthread_mutex_unlock(&ph->l.state_mutex);
-// 	return (0);
-// }
 int is_he_dead(t_philo *ph, int n)
 {
 	static int status = 0;
 
 	if (n)
 	{
-		// pthread_mutex_lock(&ph->l.state_mutex);
 		status = 1;
-		// pthread_mutex_unlock(&ph->l.state_mutex);
 	}
 	return (status);
 }
@@ -88,14 +74,15 @@ void	*philo_diner_table(void *num)
 		if (is_he_dead(ph, 0))
 			return (NULL);
 
-		pthread_mutex_lock(&ph->l.state_mutex);
-		precise_time = print_n_update(0, 0, &current_time, 0);
+		// pthread_mutex_lock(&ph->l.state_mutex);
+		precise_time = print_n_update(ph, 0, 0, &current_time, 0);
 		if (precise_time >= ph->dying_time)
 		{
+			pthread_mutex_lock(&ph->l.eat_mutex);
 			// ph->l.is_dead = 1;
+			print_n_update(ph, "died", ph->id, &current_time, DIE);
 			is_he_dead(ph, 1);
-			print_n_update("died", ph->id, &current_time, DIE);
-			unlocker((void *[]){&ph->l.state_mutex, NULL});
+			unlocker((void *[]){&ph->l.state_mutex, &ph->l.eat_mutex, NULL});
 			return (NULL);
 		}
 		pthread_mutex_unlock(&ph->l.state_mutex);
@@ -120,6 +107,9 @@ int	thread_maker(t_init i)
 	k = -1;
 	l.is_dead = 0;
 	pthread_mutex_init(&l.state_mutex, NULL);
+	pthread_mutex_init(&l.eat_mutex, NULL);
+	pthread_mutex_init(&l.print_mutex, NULL);
+	pthread_mutex_init(&l.death_mutex, NULL);
 	while (++k < i.nbr_of_philo)
 	{
 		if (init_philo(&p, k, (void *[]){&f, &i, &l}))
@@ -127,6 +117,9 @@ int	thread_maker(t_init i)
 	}
 	joiner(p);
 	pthread_mutex_destroy(&l.state_mutex);
+	pthread_mutex_destroy(&l.eat_mutex);
+	pthread_mutex_destroy(&l.print_mutex);
+	pthread_mutex_destroy(&l.death_mutex);
 	return (0);
 }
 

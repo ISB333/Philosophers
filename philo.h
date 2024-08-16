@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/15 13:27:55 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/16 13:11:04 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ typedef struct s_lock
 {
 	int				is_dead;
 	pthread_mutex_t	state_mutex;
+	pthread_mutex_t	eat_mutex;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	death_mutex;
 }					t_lock;
 
 typedef struct s_philo
@@ -84,7 +87,7 @@ void				*sleeping_time(t_philo *ph, struct timeval *current_time);
 int is_he_dead(t_philo *ph, int n);
 // int					is_philo_dead(int n, t_philo *ph);
 void				*unlocker(void **m);
-long				print_n_update(char *s, int n, struct timeval *current_time,
+long				print_n_update(t_philo *ph, char *s, int n, struct timeval *current_time,
 						int token);
 
 /// UTILS ///

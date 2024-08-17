@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/16 13:11:04 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/17 10:46:27 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # define GREEN "\033[0;32m"
 # define DEF "\033[0m"
 # define YELLOW "\033[0;33m"
-# define ORANGE "\033[38;2;255;165;0m" // RGB for orange
+# define ORANGE "\033[38;2;255;165;0m"
 
 # define THINK 100
 # define EAT 101
@@ -49,26 +49,21 @@ typedef struct s_memman
 	struct s_memman	*next;
 }					t_memman;
 
-typedef struct s_forks
-{
-	int				nbr_of_philo;
-	pthread_mutex_t	*forks;
-}					t_forks;
-
 typedef struct s_lock
 {
 	int				is_dead;
-	pthread_mutex_t	state_mutex;
+	int				nbr_of_philo;
 	pthread_mutex_t	eat_mutex;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	death_mutex;
+	pthread_mutex_t	*forks;
+	struct timeval	current_time;	
 }					t_lock;
 
 typedef struct s_philo
 {
 	pthread_t		philo;
 	long			dying_time;
-	t_forks			f;
 	t_init			i;
 	t_lock			l;
 	int				id;
@@ -76,22 +71,20 @@ typedef struct s_philo
 }					t_philo;
 
 /// SRCS ///
-
 void				*philo_diner_table(void *num);
-int					init_philo(t_philo **p, int id, void **hax);
+int					init_philo(t_philo **ph, int id, t_init i, t_lock l);
 void				parsing(t_init *i, char *argv[]);
 int					joiner(t_philo *p);
-void				*eating_time(t_philo *ph, struct timeval *current_time);
-void				*sleeping_time(t_philo *ph, struct timeval *current_time);
-// int is_one_dead(t_philo *ph);
-int is_he_dead(t_philo *ph, int n);
-// int					is_philo_dead(int n, t_philo *ph);
+void				*eating(t_philo *ph, struct timeval *current_time);
+void				*sleeping(t_philo *ph, struct timeval *current_time);
+void				*thinking(t_philo *ph, struct timeval *current_time);
+int					is_he_dead(t_philo *ph, int n);
 void				*unlocker(void **m);
-long				print_n_update(t_philo *ph, char *s, int n, struct timeval *current_time,
-						int token);
+void				printer(t_philo *ph, char *s, int n,
+						struct timeval *current_time, int token);
+long	update_time(struct timeval *current_time);
 
 /// UTILS ///
-
 void				*mem_manager(size_t size, void *ptr, int token);
 int					ft_atoi(const char *nptr);
 size_t				ft_strlen(const char *str);

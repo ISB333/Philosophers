@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/08/16 13:23:33 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/17 10:41:34 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	parsing(t_init *i, char *argv[])
 		(*i).eating_right_time = ft_atoi(argv[5]);
 }
 
-int	init_philo(t_philo **p, int id, void **hax)
+int	init_philo(t_philo **ph, int id, t_init i, t_lock l)
 {
 	t_philo	*new_node;
 	t_philo	*last_node;
@@ -32,16 +32,18 @@ int	init_philo(t_philo **p, int id, void **hax)
 		return (mem_manager(0, 0, 'C'), 1);
 	new_node->next = NULL;
 	new_node->id = id;
-	new_node->f = *(t_forks *)hax[0];
-	new_node->i = *(t_init *)hax[1];
-	new_node->l = *(t_lock *)hax[2];
+	new_node->i = i;
+	new_node->l = l;
+	gettimeofday(&new_node->l.current_time, NULL);
+	new_node->dying_time = (new_node->l.current_time.tv_sec * 1000) + (new_node->l.current_time.tv_usec
+			/ 1000) + (new_node->i.true_dying_time);
 	if (pthread_create(&new_node->philo, NULL, &philo_diner_table, new_node))
 		return (1);
-	if (!*p)
-		*p = new_node;
+	if (!*ph)
+		*ph = new_node;
 	else
 	{
-		last_node = *p;
+		last_node = *ph;
 		while (last_node->next)
 			last_node = last_node->next;
 		last_node->next = new_node;

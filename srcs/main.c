@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/17 10:58:46 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/30 13:28:42 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,7 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 			printf(YELLOW);
 		if (token == RIGHT_FORK)
 			printf(YELLOW);
-		printf("%ld %d %s\n", precise_time, n, s);
-		printf(DEF);
+		printf("%ld %d %s\n"DEF, precise_time, n, s);
 	}
 	pthread_mutex_unlock(&ph->l.print_mutex);
 }
@@ -66,15 +65,15 @@ int is_he_dead(t_philo *ph, int n)
 
 void	*philo_diner_table(void *num)
 {
-	// struct timeval	current_time;
 	long			precise_time;
 	t_philo			*ph;
 
 	ph = (t_philo *)num;
-	while (!is_he_dead(ph, 0))
+	while (1)
 	{
 		if (!eating(ph, &ph->l.current_time))
 			return (NULL);
+			// return (printf(RED"%ld %d died\n"DEF, precise_time, ph->id), NULL);
 		if (!thinking(ph, &ph->l.current_time))
 			return (NULL);
 		if (!sleeping(ph, &ph->l.current_time))
@@ -86,13 +85,14 @@ void	*philo_diner_table(void *num)
 		precise_time = update_time(&ph->l.current_time);
 		if (precise_time >= ph->dying_time)
 		{
-			pthread_mutex_lock(&ph->l.print_mutex);
-			if (is_he_dead(ph, 0))
-				return (unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL}), NULL);
+			// pthread_mutex_lock(&ph->l.print_mutex);
+			// if (is_he_dead(ph, 0))
+			// 	return (unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL}), NULL);
 			is_he_dead(ph, 1);
 			printf(RED"%ld %d died\n"DEF, precise_time, ph->id);
-			unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL});
-			// printer(ph, "died", ph->id, &ph->l.current_time, DIE);
+			pthread_mutex_unlock(&ph->l.death_mutex);
+			// unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL});
+			// unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL});
 			return (NULL);
 		}
 		pthread_mutex_unlock(&ph->l.death_mutex);
@@ -109,6 +109,7 @@ int	thread_maker(t_init i)
 	k = -1;
 	ph = NULL;
 	l.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), 0, 'A');
+	// printf("%d\n", i.nbr_of_philo);
 	l.nbr_of_philo = i.nbr_of_philo;
 	while (++k < i.nbr_of_philo)
 		if (pthread_mutex_init(&l.forks[k], NULL))
@@ -120,7 +121,6 @@ int	thread_maker(t_init i)
 	pthread_mutex_init(&l.death_mutex, NULL);
 	while (++k < i.nbr_of_philo)
 	{
-
 		if (init_philo(&ph, k, i, l))
 			return (1);
 	}

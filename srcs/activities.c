@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 09:42:21 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/17 10:47:12 by adesille         ###   ########.fr       */
+/*   Updated: 2024/08/30 13:21:10 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 	int	right;
 
 
-	pthread_mutex_lock(&ph->l.eat_mutex);
 	left = ph->id;
 	right = (ph->id + 1) % ph->l.nbr_of_philo;
 
@@ -44,11 +43,14 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 		{
 			pthread_mutex_lock(&ph->l.forks[left]);
 			printer(ph, "has taken left fork", ph->id, current_time, LEFT_FORK);
-		}
-		if (!is_he_dead(ph, 0))
-		{
-			pthread_mutex_lock(&ph->l.forks[right]);
-			printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
+			printf("WTF 0\n");
+			if (ph->l.nbr_of_philo < right)
+			{
+				printf("WTF 1\n");
+				pthread_mutex_lock(&ph->l.forks[right]);
+				printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
+			}
+			printf("WTF 2\n");
 		}
 	}
 	else
@@ -57,18 +59,14 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 		{
 			pthread_mutex_lock(&ph->l.forks[right]);
 			printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
-		}
-		if (!is_he_dead(ph, 0))
-		{
 			pthread_mutex_lock(&ph->l.forks[left]);
 			printer(ph, "has taken left fork", ph->id, current_time, LEFT_FORK);
 		}
 	}
-	pthread_mutex_unlock(&ph->l.eat_mutex);
-	
 	if (is_he_dead(ph, 0))
 		return (unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right], NULL}), NULL);
 
+	// printf("WTF 3\n");
 	pthread_mutex_lock(&ph->l.eat_mutex);
 	gettimeofday(current_time, NULL);
 	ph->dying_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec

@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 09:42:21 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/30 13:21:10 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/09 12:45:10 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,36 @@
 
 void	*sleeping(t_philo *ph, struct timeval *current_time)
 {
-	if (is_he_dead(ph, 0))
+	if (is_he_dead(ph))
 		return (NULL);
+	pthread_mutex_lock(&ph->l.sleep_mutex);
 	printer(ph, "sleeping.", ph->id, current_time, SLEEP);
 	usleep(ph->i.sleeping_time);
+	pthread_mutex_unlock(&ph->l.sleep_mutex);
 	return ("YES");
 }
 void	*thinking(t_philo *ph, struct timeval *current_time)
 {
-	if (is_he_dead(ph, 0))
+	if (is_he_dead(ph))
 		return (NULL);
 	printer(ph, "is thinking.", ph->id, current_time, THINK);
 	return ("YES");
+}
+
+void	update_death_time(t_philo *ph, struct timeval *current_time, int left, int right)
+{
+	pthread_mutex_lock(&ph->l.eat_mutex);
+	gettimeofday(current_time, NULL);
+	ph->dying_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
+			/ 1000) + (ph->i.true_dying_time);
+	printer(ph, "is eating.", ph->id, current_time, EAT);
+	if (ph->i.eating_counter)
+		ph->i.eating_counter--;
+	pthread_mutex_lock(&ph->l.sleep_mutex);
+	usleep(ph->i.eating_time);
+	pthread_mutex_unlock(&ph->l.sleep_mutex);
+	unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right],
+		&ph->l.eat_mutex, NULL});
 }
 
 void	*eating(t_philo *ph, struct timeval *current_time)
@@ -39,42 +57,32 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 
 	if (ph->id % 2 == 0)
 	{
-		if (!is_he_dead(ph, 0))
+		if (!is_he_dead(ph) && ph->l.nbr_of_philo > right)
 		{
 			pthread_mutex_lock(&ph->l.forks[left]);
 			printer(ph, "has taken left fork", ph->id, current_time, LEFT_FORK);
-			printf("WTF 0\n");
-			if (ph->l.nbr_of_philo < right)
-			{
-				printf("WTF 1\n");
-				pthread_mutex_lock(&ph->l.forks[right]);
-				printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
-			}
-			printf("WTF 2\n");
+			pthread_mutex_lock(&ph->l.forks[right]);
+			printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
+			if (is_he_dead(ph))
+				return (unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right], NULL}), NULL);
+			update_death_time(ph, current_time, left, right);
 		}
 	}
 	else
 	{
-		if (!is_he_dead(ph, 0))
+		if (!is_he_dead(ph))
 		{
 			pthread_mutex_lock(&ph->l.forks[right]);
 			printer(ph, "has taken right fork", ph->id, current_time, RIGHT_FORK);
 			pthread_mutex_lock(&ph->l.forks[left]);
 			printer(ph, "has taken left fork", ph->id, current_time, LEFT_FORK);
+			if (is_he_dead(ph))
+				return (unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right], NULL}), NULL);
+			update_death_time(ph, current_time, left, right);
 		}
 	}
-	if (is_he_dead(ph, 0))
-		return (unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right], NULL}), NULL);
-
-	// printf("WTF 3\n");
-	pthread_mutex_lock(&ph->l.eat_mutex);
-	gettimeofday(current_time, NULL);
-	ph->dying_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
-			/ 1000) + (ph->i.true_dying_time);
-	printer(ph, "is eating.", ph->id, current_time, EAT);
-	usleep(ph->i.eating_time);
-	unlocker((void *[]){&ph->l.forks[left], &ph->l.forks[right],
-		&ph->l.eat_mutex, NULL});
+	if (is_he_dead(ph))
+		return (NULL);
 	return ("YES");
 }
 

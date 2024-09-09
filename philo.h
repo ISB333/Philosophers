@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/17 10:46:27 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/09 12:44:30 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef struct s_init
 	long			true_dying_time;
 	int				eating_time;
 	int				sleeping_time;
-	int				eating_right_time;
+	int				eating_counter;
 }					t_init;
 
 typedef struct s_memman
@@ -55,7 +55,9 @@ typedef struct s_lock
 	int				nbr_of_philo;
 	pthread_mutex_t	eat_mutex;
 	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	sleep_mutex;
 	pthread_mutex_t	death_mutex;
+	pthread_mutex_t	death_check_mutex;
 	pthread_mutex_t	*forks;
 	struct timeval	current_time;	
 }					t_lock;
@@ -78,7 +80,7 @@ int					joiner(t_philo *p);
 void				*eating(t_philo *ph, struct timeval *current_time);
 void				*sleeping(t_philo *ph, struct timeval *current_time);
 void				*thinking(t_philo *ph, struct timeval *current_time);
-int					is_he_dead(t_philo *ph, int n);
+int					is_he_dead(t_philo *ph);
 void				*unlocker(void **m);
 void				printer(t_philo *ph, char *s, int n,
 						struct timeval *current_time, int token);

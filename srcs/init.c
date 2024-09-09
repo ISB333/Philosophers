@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/08/17 10:41:34 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/09 11:47:16 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,24 @@
 
 void	parsing(t_init *i, char *argv[])
 {
-	(*i).nbr_of_philo = ft_atoi(argv[1]);
+	int	n_philo;
+
+	n_philo = ft_atoi(argv[1]);
+	if (n_philo > 200)
+	{
+		error(ft_strjoin("error: number oh Philosophers", 
+			" is too high for this poor little computer\n"));
+		mem_manager(0, 0, 'C');
+		exit(EXIT_FAILURE);
+	}
+	(*i).nbr_of_philo = n_philo;
 	(*i).true_dying_time = (long)ft_atoi(argv[2]);
 	(*i).eating_time = (long)ft_atoi(argv[3]) * 1000;
 	(*i).sleeping_time = (long)ft_atoi(argv[4]) * 1000;
 	if (argv[5])
-		(*i).eating_right_time = ft_atoi(argv[5]);
+		(*i).eating_counter = ft_atoi(argv[5]);
+	else
+		(*i).eating_counter = 0;
 }
 
 int	init_philo(t_philo **ph, int id, t_init i, t_lock l)
@@ -35,8 +47,9 @@ int	init_philo(t_philo **ph, int id, t_init i, t_lock l)
 	new_node->i = i;
 	new_node->l = l;
 	gettimeofday(&new_node->l.current_time, NULL);
-	new_node->dying_time = (new_node->l.current_time.tv_sec * 1000) + (new_node->l.current_time.tv_usec
-			/ 1000) + (new_node->i.true_dying_time);
+	new_node->dying_time = (new_node->l.current_time.tv_sec * 1000)
+		+ (new_node->l.current_time.tv_usec / 1000)
+		+ (new_node->i.true_dying_time);
 	if (pthread_create(&new_node->philo, NULL, &philo_diner_table, new_node))
 		return (1);
 	if (!*ph)

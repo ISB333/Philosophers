@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/08/30 13:28:42 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/09 12:48:43 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 	long	precise_time;
 
 	pthread_mutex_lock(&ph->l.print_mutex);
-	if (is_he_dead(ph, 0) && token != DIE)
+	if (is_he_dead(ph))
 	{
 		pthread_mutex_unlock(&ph->l.print_mutex);
 		return ;
@@ -52,14 +52,13 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 	pthread_mutex_unlock(&ph->l.print_mutex);
 }
 
-int is_he_dead(t_philo *ph, int n)
+int is_he_dead(t_philo *ph)
 {
-	static int status = 0;
+	int			status;
 
-	if (n)
-	{
-		status = 1;
-	}
+	pthread_mutex_lock(&ph->l.death_check_mutex);
+	status = ph->l.is_dead;
+	pthread_mutex_unlock(&ph->l.death_check_mutex);
 	return (status);
 }
 
@@ -73,26 +72,24 @@ void	*philo_diner_table(void *num)
 	{
 		if (!eating(ph, &ph->l.current_time))
 			return (NULL);
-			// return (printf(RED"%ld %d died\n"DEF, precise_time, ph->id), NULL);
 		if (!thinking(ph, &ph->l.current_time))
 			return (NULL);
 		if (!sleeping(ph, &ph->l.current_time))
 			return (NULL);
-		if (is_he_dead(ph, 0))
+		if (is_he_dead(ph))
 			return (NULL);
 
 		pthread_mutex_lock(&ph->l.death_mutex);
 		precise_time = update_time(&ph->l.current_time);
-		if (precise_time >= ph->dying_time)
+		if (precise_time >= ph->dying_time && !ph->l.is_dead)
 		{
-			// pthread_mutex_lock(&ph->l.print_mutex);
-			// if (is_he_dead(ph, 0))
-			// 	return (unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL}), NULL);
-			is_he_dead(ph, 1);
+			// pthread_mutex_lock(&ph->l.sleep_mutex);
+			// pthread_mutex_lock(&ph->l.eat_mutex);
+			ph->l.is_dead = 1;
 			printf(RED"%ld %d died\n"DEF, precise_time, ph->id);
+			// pthread_mutex_unlock(&ph->l.sleep_mutex);
+			// pthread_mutex_unlock(&ph->l.eat_mutex);
 			pthread_mutex_unlock(&ph->l.death_mutex);
-			// unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL});
-			// unlocker((void *[]){&ph->l.death_mutex, &ph->l.print_mutex, NULL});
 			return (NULL);
 		}
 		pthread_mutex_unlock(&ph->l.death_mutex);
@@ -109,7 +106,6 @@ int	thread_maker(t_init i)
 	k = -1;
 	ph = NULL;
 	l.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), 0, 'A');
-	// printf("%d\n", i.nbr_of_philo);
 	l.nbr_of_philo = i.nbr_of_philo;
 	while (++k < i.nbr_of_philo)
 		if (pthread_mutex_init(&l.forks[k], NULL))
@@ -118,7 +114,9 @@ int	thread_maker(t_init i)
 	l.is_dead = 0;
 	pthread_mutex_init(&l.eat_mutex, NULL);
 	pthread_mutex_init(&l.print_mutex, NULL);
+	pthread_mutex_init(&l.sleep_mutex, NULL);
 	pthread_mutex_init(&l.death_mutex, NULL);
+	pthread_mutex_init(&l.death_check_mutex, NULL);
 	while (++k < i.nbr_of_philo)
 	{
 		if (init_philo(&ph, k, i, l))
@@ -127,7 +125,9 @@ int	thread_maker(t_init i)
 	joiner(ph);
 	pthread_mutex_destroy(&l.eat_mutex);
 	pthread_mutex_destroy(&l.print_mutex);
+	pthread_mutex_destroy(&l.sleep_mutex);
 	pthread_mutex_destroy(&l.death_mutex);
+	pthread_mutex_destroy(&l.death_check_mutex);
 	return (0);
 }
 

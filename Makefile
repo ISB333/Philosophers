@@ -72,7 +72,7 @@ git:
 	@git add . > /dev/null 2>&1
 	@git commit -m "$(CURRENT_DATE)" > /dev/null 2>&1
 	@git push > /dev/null 2>&1
-	@echo "$(GREEN)┌(メ▼▼)┘ GIT UPDATE └(▼▼メ)┐ $(DEF_COLOR)"
+	@echo "$(GREEN)┌(メ▼▼)┘ GIT UPDATE └(▼▼メ)┐ $(DEFAULT)"
 
 -include $(DEPFILES)
 

@@ -13,7 +13,7 @@
 ######################## ARGUMENTS ########################
 
 NAME = philo
-CFLAGS += -Wall -Wextra -MP -MD -g3 -I.
+CFLAGS += -Wall -Wextra -MP -MD -g3 -I. -fsanitize=thread
 CC = cc 
 
 DEFAULT = \033[0;39m

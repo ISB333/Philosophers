@@ -53,11 +53,7 @@ typedef struct s_lock
 {
 	int				is_dead;
 	int				nbr_of_philo;
-	pthread_mutex_t	eat_mutex;
-	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	sleep_mutex;
-	pthread_mutex_t	death_mutex;
-	pthread_mutex_t	death_check_mutex;
+	pthread_mutex_t	state_mutex;
 	pthread_mutex_t	*forks;
 	struct timeval	current_time;	
 }					t_lock;
@@ -66,15 +62,15 @@ typedef struct s_philo
 {
 	pthread_t		philo;
 	long			dying_time;
-	t_init			i;
-	t_lock			l;
+	t_init			*i;
+	t_lock			*l;
 	int				id;
 	struct s_philo	*next;
 }					t_philo;
 
 /// SRCS ///
 void				*philo_diner_table(void *num);
-int					init_philo(t_philo **ph, int id, t_init i, t_lock l);
+int					init_philo(t_philo **ph, int id, t_init *i, t_lock *l);
 void				parsing(t_init *i, char *argv[]);
 int					joiner(t_philo *p);
 void				*eating(t_philo *ph, struct timeval *current_time);

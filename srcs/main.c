@@ -26,12 +26,9 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 {
 	long	precise_time;
 
-	pthread_mutex_lock(&ph->l.print_mutex);
 	if (is_he_dead(ph))
-	{
-		pthread_mutex_unlock(&ph->l.print_mutex);
 		return ;
-	}
+	pthread_mutex_lock(&ph->l->state_mutex);
 	gettimeofday(current_time, NULL);
 	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
 			/ 1000);
@@ -49,16 +46,16 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 			printf(YELLOW);
 		printf("%ld %d %s\n"DEF, precise_time, n, s);
 	}
-	pthread_mutex_unlock(&ph->l.print_mutex);
+	pthread_mutex_unlock(&ph->l->state_mutex);
 }
 
 int is_he_dead(t_philo *ph)
 {
 	int			status;
 
-	pthread_mutex_lock(&ph->l.death_check_mutex);
-	status = ph->l.is_dead;
-	pthread_mutex_unlock(&ph->l.death_check_mutex);
+	pthread_mutex_lock(&ph->l->state_mutex);
+	status = ph->l->is_dead;
+	pthread_mutex_unlock(&ph->l->state_mutex);
 	return (status);
 }
 
@@ -68,31 +65,29 @@ void	*philo_diner_table(void *num)
 	t_philo			*ph;
 
 	ph = (t_philo *)num;
-	while (1)
+	while (!is_he_dead(ph))
 	{
-		if (!eating(ph, &ph->l.current_time))
-			return (NULL);
-		if (!thinking(ph, &ph->l.current_time))
-			return (NULL);
-		if (!sleeping(ph, &ph->l.current_time))
+		if (!eating(ph, &ph->l->current_time))
 			return (NULL);
 		if (is_he_dead(ph))
 			return (NULL);
-
-		pthread_mutex_lock(&ph->l.death_mutex);
-		precise_time = update_time(&ph->l.current_time);
-		if (precise_time >= ph->dying_time && !ph->l.is_dead)
-		{
-			// pthread_mutex_lock(&ph->l.sleep_mutex);
-			// pthread_mutex_lock(&ph->l.eat_mutex);
-			ph->l.is_dead = 1;
-			printf(RED"%ld %d died\n"DEF, precise_time, ph->id);
-			// pthread_mutex_unlock(&ph->l.sleep_mutex);
-			// pthread_mutex_unlock(&ph->l.eat_mutex);
-			pthread_mutex_unlock(&ph->l.death_mutex);
+		if (!thinking(ph, &ph->l->current_time))
 			return (NULL);
+		// if (!sleeping(ph, &ph->l.current_time))
+		// 	return (NULL);
+		if (!is_he_dead(ph))
+		{
+			pthread_mutex_lock(&ph->l->state_mutex);
+			precise_time = update_time(&ph->l->current_time);
+			if (precise_time >= ph->dying_time && !ph->l->is_dead)
+			{
+				ph->l->is_dead = 1;
+				printf(RED"%ld %d died\n"DEF, precise_time, ph->id);
+				pthread_mutex_unlock(&ph->l->state_mutex);
+				return (NULL);
+			}
+			pthread_mutex_unlock(&ph->l->state_mutex);
 		}
-		pthread_mutex_unlock(&ph->l.death_mutex);
 	}
 	return (NULL);
 }
@@ -112,22 +107,14 @@ int	thread_maker(t_init i)
 			return (1);
 	k = -1;
 	l.is_dead = 0;
-	pthread_mutex_init(&l.eat_mutex, NULL);
-	pthread_mutex_init(&l.print_mutex, NULL);
-	pthread_mutex_init(&l.sleep_mutex, NULL);
-	pthread_mutex_init(&l.death_mutex, NULL);
-	pthread_mutex_init(&l.death_check_mutex, NULL);
+	pthread_mutex_init(&l.state_mutex, NULL);
 	while (++k < i.nbr_of_philo)
 	{
-		if (init_philo(&ph, k, i, l))
+		if (init_philo(&ph, k, &i, &l))
 			return (1);
 	}
 	joiner(ph);
-	pthread_mutex_destroy(&l.eat_mutex);
-	pthread_mutex_destroy(&l.print_mutex);
-	pthread_mutex_destroy(&l.sleep_mutex);
-	pthread_mutex_destroy(&l.death_mutex);
-	pthread_mutex_destroy(&l.death_check_mutex);
+	pthread_mutex_destroy(&l.state_mutex);
 	return (0);
 }
 

@@ -22,12 +22,13 @@ long	update_time(struct timeval *current_time)
 	return (precise_time);
 }
 
-void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int token)
+void	*printer(t_philo *ph, char *s, int n, struct timeval *current_time,
+		int token)
 {
 	long	precise_time;
 
 	if (is_he_dead(ph))
-		return ;
+		return (NULL);
 	pthread_mutex_lock(&ph->l->state_mutex);
 	gettimeofday(current_time, NULL);
 	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
@@ -44,14 +45,15 @@ void	printer(t_philo *ph, char *s, int n, struct timeval *current_time, int toke
 			printf(YELLOW);
 		if (token == RIGHT_FORK)
 			printf(YELLOW);
-		printf("%ld %d %s\n"DEF, precise_time, n, s);
+		printf("%ld %d %s\n" DEF, precise_time, n, s);
 	}
 	pthread_mutex_unlock(&ph->l->state_mutex);
+	return ("YES");
 }
 
-int is_he_dead(t_philo *ph)
+int	is_he_dead(t_philo *ph)
 {
-	int			status;
+	int	status;
 
 	pthread_mutex_lock(&ph->l->state_mutex);
 	status = ph->l->is_dead;
@@ -61,33 +63,28 @@ int is_he_dead(t_philo *ph)
 
 void	*philo_diner_table(void *num)
 {
-	long			precise_time;
-	t_philo			*ph;
+	long	precise_time;
+	t_philo	*ph;
 
 	ph = (t_philo *)num;
-	while (!is_he_dead(ph))
+	while (!is_he_dead(ph) && ph->i.eating_counter)
 	{
 		if (!eating(ph, &ph->l->current_time))
 			return (NULL);
-		if (is_he_dead(ph))
-			return (NULL);
 		if (!thinking(ph, &ph->l->current_time))
 			return (NULL);
-		// if (!sleeping(ph, &ph->l.current_time))
-		// 	return (NULL);
-		if (!is_he_dead(ph))
+		if (!sleeping(ph, &ph->l->current_time))
+			return (NULL);
+		pthread_mutex_lock(&ph->l->state_mutex);
+		precise_time = update_time(&ph->l->current_time);
+		if (precise_time >= ph->dying_time && !ph->l->is_dead)
 		{
-			pthread_mutex_lock(&ph->l->state_mutex);
-			precise_time = update_time(&ph->l->current_time);
-			if (precise_time >= ph->dying_time && !ph->l->is_dead)
-			{
-				ph->l->is_dead = 1;
-				printf(RED"%ld %d died\n"DEF, precise_time, ph->id);
-				pthread_mutex_unlock(&ph->l->state_mutex);
-				return (NULL);
-			}
+			ph->l->is_dead = 1;
+			printf(RED "%ld %d died\n" DEF, precise_time, ph->id);
 			pthread_mutex_unlock(&ph->l->state_mutex);
+			return (NULL);
 		}
+		pthread_mutex_unlock(&ph->l->state_mutex);
 	}
 	return (NULL);
 }
@@ -118,12 +115,36 @@ int	thread_maker(t_init i)
 	return (0);
 }
 
+int	is_num(char c)
+{
+	if (c >= '0' && c <= '9')
+		return (1);
+	return (0);
+}
+
+void	check_format(char *argv[])
+{
+	int	i;
+	int	k;
+
+	i = 0;
+	k = -1;
+	while (argv[++i])
+	{
+		k = -1;
+		while (argv[i][++k])
+			if (!is_num(argv[i][k]))
+				return (printf("wrong format\n"), exit(EXIT_FAILURE));
+	}
+}
+
 int	main(int argc, char *argv[])
 {
 	t_init	i;
 
 	if (argc == 5 || argc == 6)
 	{
+		check_format(argv);
 		parsing(&i, argv);
 		thread_maker(i);
 	}

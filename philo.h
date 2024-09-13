@@ -62,7 +62,7 @@ typedef struct s_philo
 {
 	pthread_t		philo;
 	long			dying_time;
-	t_init			*i;
+	t_init			i;
 	t_lock			*l;
 	int				id;
 	struct s_philo	*next;
@@ -78,7 +78,7 @@ void				*sleeping(t_philo *ph, struct timeval *current_time);
 void				*thinking(t_philo *ph, struct timeval *current_time);
 int					is_he_dead(t_philo *ph);
 void				*unlocker(void **m);
-void				printer(t_philo *ph, char *s, int n,
+void				*printer(t_philo *ph, char *s, int n,
 						struct timeval *current_time, int token);
 long	update_time(struct timeval *current_time);
 

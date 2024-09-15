@@ -27,12 +27,19 @@
 # define YELLOW "\033[0;33m"
 # define ORANGE "\033[38;2;255;165;0m"
 
+# define ALLOCATE 300
+# define FREE_MEMORY 301
+
 # define THINK 100
 # define EAT 101
 # define SLEEP 102
 # define DIE 103
 # define LEFT_FORK 104
 # define RIGHT_FORK 105
+
+# define STATE_MUTEX 0
+# define EAT_MUTEX 1
+# define PRINT_MUTEX 2
 
 typedef struct s_init
 {
@@ -54,8 +61,9 @@ typedef struct s_lock
 	int				is_dead;
 	int				nbr_of_philo;
 	pthread_mutex_t	state_mutex;
+	pthread_mutex_t	m[3];
 	pthread_mutex_t	*forks;
-	struct timeval	current_time;	
+	struct timeval	current_time;
 }					t_lock;
 
 typedef struct s_philo
@@ -80,10 +88,14 @@ int					is_he_dead(t_philo *ph);
 void				*unlocker(void **m);
 void				*printer(t_philo *ph, char *s, int n,
 						struct timeval *current_time, int token);
-long	update_time(struct timeval *current_time);
+long				update_time(struct timeval *current_time);
+int					is_num(char c);
+void				check_format(char *argv[]);
+int					is_he_dead(t_philo *ph);
+int					check_death(t_philo *ph);
 
 /// UTILS ///
-void				*mem_manager(size_t size, void *ptr, int token);
+void				*mem_manager(size_t size, int token);
 int					ft_atoi(const char *nptr);
 size_t				ft_strlen(const char *str);
 void				*ff(t_memman *mem_list);

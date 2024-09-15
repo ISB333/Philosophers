@@ -51,40 +51,19 @@ void	*printer(t_philo *ph, char *s, int n, struct timeval *current_time,
 	return ("YES");
 }
 
-int	is_he_dead(t_philo *ph)
-{
-	int	status;
-
-	pthread_mutex_lock(&ph->l->state_mutex);
-	status = ph->l->is_dead;
-	pthread_mutex_unlock(&ph->l->state_mutex);
-	return (status);
-}
-
 void	*philo_diner_table(void *num)
 {
-	long	precise_time;
 	t_philo	*ph;
 
 	ph = (t_philo *)num;
 	while (!is_he_dead(ph) && ph->i.eating_counter)
 	{
-		if (!eating(ph, &ph->l->current_time))
+		if (check_death(ph) || !eating(ph, &ph->l->current_time))
 			return (NULL);
-		if (!thinking(ph, &ph->l->current_time))
+		if (check_death(ph) || !thinking(ph, &ph->l->current_time))
 			return (NULL);
-		if (!sleeping(ph, &ph->l->current_time))
+		if (check_death(ph) || !sleeping(ph, &ph->l->current_time))
 			return (NULL);
-		pthread_mutex_lock(&ph->l->state_mutex);
-		precise_time = update_time(&ph->l->current_time);
-		if (precise_time >= ph->dying_time && !ph->l->is_dead)
-		{
-			ph->l->is_dead = 1;
-			printf(RED "%ld %d died\n" DEF, precise_time, ph->id);
-			pthread_mutex_unlock(&ph->l->state_mutex);
-			return (NULL);
-		}
-		pthread_mutex_unlock(&ph->l->state_mutex);
 	}
 	return (NULL);
 }
@@ -97,7 +76,7 @@ int	thread_maker(t_init i)
 
 	k = -1;
 	ph = NULL;
-	l.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), 0, 'A');
+	l.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), ALLOCATE);
 	l.nbr_of_philo = i.nbr_of_philo;
 	while (++k < i.nbr_of_philo)
 		if (pthread_mutex_init(&l.forks[k], NULL))
@@ -115,29 +94,6 @@ int	thread_maker(t_init i)
 	return (0);
 }
 
-int	is_num(char c)
-{
-	if (c >= '0' && c <= '9')
-		return (1);
-	return (0);
-}
-
-void	check_format(char *argv[])
-{
-	int	i;
-	int	k;
-
-	i = 0;
-	k = -1;
-	while (argv[++i])
-	{
-		k = -1;
-		while (argv[i][++k])
-			if (!is_num(argv[i][k]))
-				return (printf("wrong format\n"), exit(EXIT_FAILURE));
-	}
-}
-
 int	main(int argc, char *argv[])
 {
 	t_init	i;
@@ -151,5 +107,5 @@ int	main(int argc, char *argv[])
 	else
 		return (error("wrong number of arguments\n"), 1);
 	printf("-----------------------------\n\n");
-	return (mem_manager(0, 0, 'C'), 0);
+	return (mem_manager(0, FREE_MEMORY), 0);
 }

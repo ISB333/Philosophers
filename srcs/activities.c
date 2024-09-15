@@ -79,8 +79,6 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 			update_death_time(ph, current_time, left, right);
 		}
 	}
-	if (is_he_dead(ph))
-		return (NULL);
 	return ("YES");
 }
 

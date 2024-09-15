@@ -21,7 +21,7 @@ void	parsing(t_init *i, char *argv[])
 	{
 		error(ft_strjoin("error: number oh Philosophers",
 				" is too high for this poor little computer\n"));
-		mem_manager(0, 0, 'C');
+		mem_manager(0, FREE_MEMORY);
 		exit(EXIT_FAILURE);
 	}
 	(*i).nbr_of_philo = n_philo;
@@ -39,9 +39,9 @@ int	init_philo(t_philo **ph, int id, t_init *i, t_lock *l)
 	t_philo	*new_node;
 	t_philo	*last_node;
 
-	new_node = malloc(sizeof(t_philo));
+	new_node = mem_manager(sizeof(t_philo), ALLOCATE);
 	if (!new_node)
-		return (mem_manager(0, 0, 'C'), 1);
+		return (mem_manager(0, FREE_MEMORY), 1);
 	new_node->next = NULL;
 	new_node->id = id;
 	new_node->i = *i;

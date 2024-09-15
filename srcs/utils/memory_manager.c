@@ -37,14 +37,14 @@ void	*allocate(t_memman **mem_list, size_t size)
 	ptr = malloc(size);
 	if (!ptr)
 	{
-		mem_manager(0, 0, 'C');
+		mem_manager(0, FREE_MEMORY);
 		exit(EXIT_FAILURE);
 	}
 	new_node = malloc(sizeof(t_memman));
 	if (!new_node)
 	{
 		free(ptr);
-		mem_manager(0, 0, 'C');
+		mem_manager(0, FREE_MEMORY);
 		exit(EXIT_FAILURE);
 	}
 	init_node(new_node, mem_list, ptr);
@@ -76,14 +76,12 @@ void	*free_ptr(t_memman **mem_list, void *ptr)
 	return (NULL);
 }
 
-void	*mem_manager(size_t size, void *ptr, int token)
+void	*mem_manager(size_t size, int token)
 {
 	static t_memman	*mem_list = NULL;
 
 	if (token == 'A')
 		return (allocate(&mem_list, size));
-	if (token == 'F')
-		return (free_ptr(&mem_list, ptr));
 	if (token == 'C')
 	{
 		ff(mem_list);

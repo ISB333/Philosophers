@@ -24,7 +24,7 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = ./srcs/main.c ./srcs/init.c ./srcs/activities.c
+SRCS = ./srcs/main.c ./srcs/init.c ./srcs/activities.c ./srcs/verification.c
 
 UTILS =./srcs/utils/utils.c \
 	./srcs/utils/memory_manager.c ./srcs/utils/memory_manager_utils.c

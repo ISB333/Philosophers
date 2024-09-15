@@ -39,7 +39,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (s1 == NULL || s2 == NULL)
 		return (NULL);
 	len = ft_strlen(s1) + ft_strlen(s2) + 1;
-	str = mem_manager(len * sizeof(char), 0, 'A');
+	str = mem_manager(len * sizeof(char), ALLOCATE);
 	if (str == NULL)
 		return (NULL);
 	ft_strlcpy(str, s1, (ft_strlen(s1) + 1));

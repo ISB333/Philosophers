@@ -13,7 +13,7 @@
 ######################## ARGUMENTS ########################
 
 NAME = philo
-CFLAGS += -Wall -Wextra -MP -MD -g3 -I. -fsanitize=thread
+CFLAGS += -Wall -Wextra -MP -MD -g3 -I./headers -fsanitize=thread
 CC = cc 
 
 DEFAULT = \033[0;39m
@@ -46,8 +46,8 @@ VALGRIND = valgrind -s --leak-check=full --track-origins=yes --track-fds=yes --s
 
 all : $(NAME)
 
-$(NAME) : $(OBJS) $(LIBFT)
-	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -o $(NAME)
+$(NAME) : $(OBJS)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 $(OBJ_DIR)/%.o : %.c
 	@mkdir -p $(@D)

@@ -80,9 +80,9 @@ void	*mem_manager(size_t size, int token)
 {
 	static t_memman	*mem_list = NULL;
 
-	if (token == 'A')
+	if (token == ALLOCATE)
 		return (allocate(&mem_list, size));
-	if (token == 'C')
+	if (token == FREE_MEMORY)
 	{
 		ff(mem_list);
 		mem_list = NULL;

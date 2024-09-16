@@ -12,6 +12,30 @@
 
 #include "philo.h"
 
+void	mutex_destroyer(t_lock *l)
+{
+	int	k;
+
+	k = -1;
+	while (++k < 3)
+		pthread_mutex_destroy(&(*l).m[k]);
+}
+
+int	mutex_init(t_lock *l, int nbr_of_philo)
+{
+	int	k;
+
+	k = -1;
+	while (++k < nbr_of_philo)
+		if (pthread_mutex_init(&(*l).forks[k], NULL))
+			return (error("error while initializing mutex\n"), 1);
+	k = -1;
+	while (++k < 3)
+		if (pthread_mutex_init(&(*l).m[k], NULL))
+			return (error("error while initializing mutex\n"), 1);
+	return (0);
+}
+
 void	parsing(t_init *i, char *argv[])
 {
 	int	n_philo;
@@ -34,7 +58,7 @@ void	parsing(t_init *i, char *argv[])
 		(*i).eating_counter = -1;
 }
 
-int	init_philo(t_philo **ph, int id, t_init *i, t_lock *l)
+int	init_philo(t_philo **ph, int id, t_init i, t_lock *l)
 {
 	t_philo	*new_node;
 	t_philo	*last_node;
@@ -44,11 +68,9 @@ int	init_philo(t_philo **ph, int id, t_init *i, t_lock *l)
 		return (mem_manager(0, FREE_MEMORY), 1);
 	new_node->next = NULL;
 	new_node->id = id;
-	new_node->i = *i;
+	new_node->i = i;
 	new_node->l = l;
-	gettimeofday(&new_node->l->current_time, NULL);
-	new_node->dying_time = (new_node->l->current_time.tv_sec * 1000)
-		+ (new_node->l->current_time.tv_usec / 1000)
+	new_node->dying_time = get_time(&new_node->l->current_time)
 		+ (new_node->i.true_dying_time);
 	if (pthread_create(&new_node->philo, NULL, &philo_diner_table, new_node))
 		return (1);

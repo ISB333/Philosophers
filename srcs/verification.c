@@ -1,5 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   verification.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
+/*   Updated: 2024/09/09 12:48:43 by adesille         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
+void	*unlocker(void **m)
+{
+	int	i;
+
+	i = -1;
+	while (m[++i])
+		pthread_mutex_unlock((pthread_mutex_t *)m[i]);
+	return (NULL);
+}
 
 int	is_num(char c)
 {
@@ -28,25 +49,25 @@ int	is_he_dead(t_philo *ph)
 {
 	int	status;
 
-	pthread_mutex_lock(&ph->l->state_mutex);
+	pthread_mutex_lock(&ph->l->m[STATE_MUTEX]);
 	status = ph->l->is_dead;
-	pthread_mutex_unlock(&ph->l->state_mutex);
+	pthread_mutex_unlock(&ph->l->m[STATE_MUTEX]);
 	return (status);
 }
 
-int check_death(t_philo *ph)
+int	check_death(t_philo *ph)
 {
 	long	precise_time;
 
-	pthread_mutex_lock(&ph->l->state_mutex);
-	precise_time = update_time(&ph->l->current_time);
+	pthread_mutex_lock(&ph->l->m[STATE_MUTEX]);
+	precise_time = get_time(&ph->l->current_time);
 	if (precise_time >= ph->dying_time && !ph->l->is_dead)
 	{
 		ph->l->is_dead = 1;
 		printf(RED "%ld %d died\n" DEF, precise_time, ph->id);
-		pthread_mutex_unlock(&ph->l->state_mutex);
+		pthread_mutex_unlock(&ph->l->m[STATE_MUTEX]);
 		return (1);
 	}
-	pthread_mutex_unlock(&ph->l->state_mutex);
+	pthread_mutex_unlock(&ph->l->m[STATE_MUTEX]);
 	return (0);
 }

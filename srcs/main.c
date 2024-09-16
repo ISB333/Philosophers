@@ -12,7 +12,9 @@
 
 #include "philo.h"
 
-long	update_time(struct timeval *current_time)
+// TODO : SEMAPHORE
+
+long	get_time(struct timeval *current_time)
 {
 	long	precise_time;
 
@@ -22,17 +24,16 @@ long	update_time(struct timeval *current_time)
 	return (precise_time);
 }
 
-void	*printer(t_philo *ph, char *s, int n, struct timeval *current_time,
-		int token)
+void	*printer(t_philo *ph, char *s, int n, int token)
 {
 	long	precise_time;
 
 	if (is_he_dead(ph))
 		return (NULL);
-	pthread_mutex_lock(&ph->l->state_mutex);
-	gettimeofday(current_time, NULL);
-	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
-			/ 1000);
+	pthread_mutex_lock(&ph->l->m[PRINT_MUTEX]);
+	gettimeofday(&ph->l->current_time, NULL);
+	precise_time = ((ph->l->current_time).tv_sec * 1000)
+		+ ((ph->l->current_time).tv_usec / 1000);
 	if (s)
 	{
 		if (token == EAT)
@@ -47,7 +48,7 @@ void	*printer(t_philo *ph, char *s, int n, struct timeval *current_time,
 			printf(YELLOW);
 		printf("%ld %d %s\n" DEF, precise_time, n, s);
 	}
-	pthread_mutex_unlock(&ph->l->state_mutex);
+	pthread_mutex_unlock(&ph->l->m[PRINT_MUTEX]);
 	return ("YES");
 }
 
@@ -60,9 +61,9 @@ void	*philo_diner_table(void *num)
 	{
 		if (check_death(ph) || !eating(ph, &ph->l->current_time))
 			return (NULL);
-		if (check_death(ph) || !thinking(ph, &ph->l->current_time))
+		if (check_death(ph) || !thinking(ph))
 			return (NULL);
-		if (check_death(ph) || !sleeping(ph, &ph->l->current_time))
+		if (check_death(ph) || !sleeping(ph))
 			return (NULL);
 	}
 	return (NULL);
@@ -74,23 +75,20 @@ int	thread_maker(t_init i)
 	t_lock	l;
 	int		k;
 
-	k = -1;
 	ph = NULL;
 	l.forks = mem_manager(i.nbr_of_philo * sizeof(pthread_mutex_t), ALLOCATE);
 	l.nbr_of_philo = i.nbr_of_philo;
-	while (++k < i.nbr_of_philo)
-		if (pthread_mutex_init(&l.forks[k], NULL))
-			return (1);
-	k = -1;
 	l.is_dead = 0;
-	pthread_mutex_init(&l.state_mutex, NULL);
+	if (mutex_init(&l, i.nbr_of_philo))
+		return (1);
+	k = -1;
 	while (++k < i.nbr_of_philo)
 	{
-		if (init_philo(&ph, k, &i, &l))
+		if (init_philo(&ph, k, i, &l))
 			return (1);
 	}
 	joiner(ph);
-	pthread_mutex_destroy(&l.state_mutex);
+	mutex_destroyer(&l);
 	return (0);
 }
 
@@ -102,7 +100,8 @@ int	main(int argc, char *argv[])
 	{
 		check_format(argv);
 		parsing(&i, argv);
-		thread_maker(i);
+		if (thread_maker(i))
+			return (mem_manager(0, FREE_MEMORY), 1);
 	}
 	else
 		return (error("wrong number of arguments\n"), 1);

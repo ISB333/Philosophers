@@ -1,6 +1,6 @@
-.obj/./srcs/main.o: srcs/main.c /usr/include/stdc-predef.h philo.h \
- /usr/include/pthread.h /usr/include/features.h \
- /usr/include/features-time64.h \
+.obj/./srcs/main.o: srcs/main.c /usr/include/stdc-predef.h \
+ headers/philo.h headers/config.h headers/philo.h /usr/include/pthread.h \
+ /usr/include/features.h /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
  /usr/include/x86_64-linux-gnu/bits/timesize.h \
  /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -67,9 +67,12 @@
  /usr/include/x86_64-linux-gnu/bits/confname.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd_ext.h
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h headers/functions.h \
+ headers/mem_manager.h headers/structures.h
 /usr/include/stdc-predef.h:
-philo.h:
+headers/philo.h:
+headers/config.h:
+headers/philo.h:
 /usr/include/pthread.h:
 /usr/include/features.h:
 /usr/include/features-time64.h:
@@ -147,3 +150,6 @@ philo.h:
 /usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
 /usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
+headers/functions.h:
+headers/mem_manager.h:
+headers/structures.h:

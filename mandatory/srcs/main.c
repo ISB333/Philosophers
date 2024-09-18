@@ -12,8 +12,6 @@
 
 #include "philo.h"
 
-// TODO : SEMAPHORE
-
 long	get_time(struct timeval *current_time)
 {
 	long	precise_time;
@@ -59,7 +57,7 @@ void	*philo_diner_table(void *num)
 	ph = (t_philo *)num;
 	while (!is_he_dead(ph) && ph->i.eating_counter)
 	{
-		if (check_death(ph) || !eating(ph, &ph->l->current_time))
+		if (check_death(ph) || !eating(ph))
 			return (NULL);
 		if (check_death(ph) || !thinking(ph))
 			return (NULL);

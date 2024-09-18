@@ -12,8 +12,6 @@
 
 #include "philo.h"
 
-// TODO : SEMAPHORE
-
 long	get_time(struct timeval *current_time)
 {
 	long	precise_time;

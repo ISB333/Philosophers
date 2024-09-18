@@ -46,7 +46,19 @@ void	update_death_time(t_philo *ph, struct timeval *current_time, int left,
 		&ph->l->m[EAT_MUTEX], NULL});
 }
 
-void	*eating(t_philo *ph, struct timeval *current_time)
+void	eating_utils(t_philo *ph, int left, int right)
+{
+	if (!is_he_dead(ph))
+	{
+		pthread_mutex_lock(&ph->l->forks[right]);
+		printer(ph, "has taken right fork", ph->id, RIGHT_FORK);
+		pthread_mutex_lock(&ph->l->forks[left]);
+		printer(ph, "has taken left fork", ph->id, LEFT_FORK);
+		update_death_time(ph, &ph->l->current_time, left, right);
+	}
+}
+
+void	*eating(t_philo *ph)
 {
 	int	left;
 	int	right;
@@ -63,22 +75,13 @@ void	*eating(t_philo *ph, struct timeval *current_time)
 			{
 				pthread_mutex_lock(&ph->l->forks[right]);
 				printer(ph, "has taken right fork", ph->id, RIGHT_FORK);
-				update_death_time(ph, current_time, left, right);
+				update_death_time(ph, &ph->l->current_time, left, right);
 			}
 			else
 				pthread_mutex_unlock(&ph->l->forks[left]);
 		}
 	}
 	else
-	{
-		if (!is_he_dead(ph))
-		{
-			pthread_mutex_lock(&ph->l->forks[right]);
-			printer(ph, "has taken right fork", ph->id, RIGHT_FORK);
-			pthread_mutex_lock(&ph->l->forks[left]);
-			printer(ph, "has taken left fork", ph->id, LEFT_FORK);
-			update_death_time(ph, current_time, left, right);
-		}
-	}
+		eating_utils(ph, left, right);
 	return ("YES");
 }

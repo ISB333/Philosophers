@@ -84,7 +84,7 @@ int					mutex_init(t_lock *l, int nbr_of_philo);
 void				mutex_destroyer(t_lock *l);
 void				parsing(t_init *i, char *argv[]);
 int					joiner(t_philo *p);
-void				*eating(t_philo *ph, struct timeval *current_time);
+void				*eating(t_philo *ph);
 void				*sleeping(t_philo *ph);
 void				*thinking(t_philo *ph);
 int					is_he_dead(t_philo *ph);

@@ -13,12 +13,16 @@
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <fcntl.h>
 # include <pthread.h>
+# include <semaphore.h>
+# include <signal.h>
+# include <stddef.h>
 # include <stdio.h>
 # include <stdlib.h>
-# include <stddef.h>
 # include <string.h>
 # include <sys/time.h>
+# include <sys/wait.h>
 # include <unistd.h>
 
 # define RED "\033[0;31m"
@@ -59,17 +63,19 @@ typedef struct s_init
 
 typedef struct s_lock
 {
-	pid_t			pid;
 	int				is_dead;
 	int				nbr_of_philo;
-	pthread_mutex_t	m[3];
-	pthread_mutex_t	*forks;
+	sem_t			*state;
+	sem_t			*eat;
+	sem_t			*print;
+	sem_t			*forks;
 	struct timeval	current_time;
 }					t_lock;
 
 typedef struct s_philo
 {
-	pthread_t		philo;
+	// pthread_t		philo;
+	pid_t			pid;
 	long			dying_time;
 	t_init			i;
 	t_lock			*l;
@@ -78,17 +84,16 @@ typedef struct s_philo
 }					t_philo;
 
 /// SRCS ///
-void				*philo_diner_table(void *num);
+void				*philo_diner_table(t_philo *ph);
 int					init_philo(t_philo **ph, int id, t_init i, t_lock *l);
-int					mutex_init(t_lock *l, int nbr_of_philo);
-void				mutex_destroyer(t_lock *l);
 void				parsing(t_init *i, char *argv[]);
-int					joiner(t_philo *p);
 void				*eating(t_philo *ph, struct timeval *current_time);
 void				*sleeping(t_philo *ph);
 void				*thinking(t_philo *ph);
 int					is_he_dead(t_philo *ph);
-void				*unlocker(void **m);
+int					opener(t_lock *l);
+void				closer(void *name[]);
+void				unlinker(char *name[]);
 void				*printer(t_philo *ph, char *s, int n, int token);
 long				get_time(struct timeval *current_time);
 int					is_num(char c);

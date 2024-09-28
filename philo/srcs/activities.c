@@ -6,11 +6,32 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 09:42:21 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:39:49 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/28 13:15:04 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void ft_usleep(t_philo *ph, long time_to_sleep)
+{
+	long time;
+	long precise_time;
+
+	gettimeofday(&ph->l->current_time, NULL);
+	time = ((ph->l->current_time).tv_sec * 1000) + ((ph->l->current_time).tv_usec
+			/ 1000) + time_to_sleep;
+	precise_time = ((ph->l->current_time).tv_sec * 1000) + ((ph->l->current_time).tv_usec
+			/ 1000);
+	printf("%ld\n%ld\n", time, precise_time);
+	while (precise_time < time)
+	{
+		usleep(1);
+		gettimeofday(&ph->l->current_time, NULL);
+		precise_time = ((ph->l->current_time).tv_sec * 1000) + ((ph->l->current_time).tv_usec
+			/ 1000);
+		printf("%ld\n", precise_time);
+	}
+}
 
 int	sleeping(t_philo *ph)
 {
@@ -35,13 +56,15 @@ void	update_death_time(t_philo *ph, struct timeval *current_time, int left,
 		return ;
 	}
 	pthread_mutex_lock(&ph->l->m[EAT_MUTEX]);
+	printer(ph, "is eating.", ph->id, EAT);
+	ft_usleep(ph, ph->i.eating_time);
+	if (check_death(ph))
+		return (unlocker((void *[]){&ph->l->forks[left], &ph->l->forks[right], &ph->l->m[EAT_MUTEX], NULL}), (void)0);
 	gettimeofday(current_time, NULL);
 	ph->dying_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
 			/ 1000) + (ph->i.true_dying_time);
 	if (ph->i.eating_counter != -1)
 		ph->i.eating_counter--;
-	printer(ph, "is eating.", ph->id, EAT);
-	usleep(ph->i.eating_time);
 	unlocker((void *[]){&ph->l->forks[left], &ph->l->forks[right],
 		&ph->l->m[EAT_MUTEX], NULL});
 }

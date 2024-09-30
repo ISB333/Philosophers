@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/09/27 09:28:52 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/30 11:05:57 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void	parsing(t_init *i, char *argv[])
 	}
 	(*i).nbr_of_philo = n_philo;
 	(*i).true_dying_time = (long)ft_atoi(argv[2]);
-	(*i).eating_time = (long)ft_atoi(argv[3]) * 1000;
-	(*i).sleeping_time = (long)ft_atoi(argv[4]) * 1000;
+	(*i).eating_time = (long)ft_atoi(argv[3]);
+	(*i).sleeping_time = (long)ft_atoi(argv[4]);
 	if (argv[5])
 		(*i).eating_counter = ft_atoi(argv[5]);
 	else

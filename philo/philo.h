@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:37:02 by adesille         ###   ########.fr       */
+/*   Updated: 2024/09/30 16:26:29 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ typedef struct s_init
 {
 	int				nbr_of_philo;
 	long			true_dying_time;
-	int				eating_time;
-	int				sleeping_time;
+	long			eating_time;
+	long			sleeping_time;
 	int				eating_counter;
 }					t_init;
 
@@ -61,6 +61,7 @@ typedef struct s_lock
 {
 	pid_t			pid;
 	int				is_dead;
+	long 			start_time;
 	int				nbr_of_philo;
 	pthread_mutex_t	m[3];
 	pthread_mutex_t	*forks;
@@ -95,6 +96,7 @@ int					is_num(char c);
 void				check_format(char *argv[]);
 int					is_he_dead(t_philo *ph);
 int					check_death(t_philo *ph);
+void				killer(t_philo *ph, int left);
 
 void				*mem_manager(size_t size, int token);
 int					ft_atoi(const char *nptr);

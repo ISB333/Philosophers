@@ -1,25 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_n_manage.c                                    :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/09/30 11:05:57 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:25:54 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-void	mutex_destroyer(t_lock *l)
-{
-	int	k;
-
-	k = -1;
-	while (++k < 3)
-		pthread_mutex_destroy(&(*l).m[k]);
-}
 
 int	mutex_init(t_lock *l, int nbr_of_philo)
 {
@@ -49,9 +40,9 @@ void	parsing(t_init *i, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	(*i).nbr_of_philo = n_philo;
-	(*i).true_dying_time = (long)ft_atoi(argv[2]);
-	(*i).eating_time = (long)ft_atoi(argv[3]);
-	(*i).sleeping_time = (long)ft_atoi(argv[4]);
+	(*i).true_dying_time = ft_atoi(argv[2]);
+	(*i).eating_time = ft_atoi(argv[3]);
+	(*i).sleeping_time = ft_atoi(argv[4]);
 	if (argv[5])
 		(*i).eating_counter = ft_atoi(argv[5]);
 	else
@@ -68,8 +59,8 @@ int	init_philo(t_philo **ph, int id, t_init i, t_lock *l)
 	new_node->id = id;
 	new_node->i = i;
 	new_node->l = l;
-	new_node->dying_time = get_time(&new_node->l->current_time)
-		+ (new_node->i.true_dying_time);
+	new_node->dying_time = get_time() + (new_node->i.true_dying_time);
+	new_node->start_time = get_time();
 	if (pthread_create(&new_node->philo, NULL, &philo_diner_table, new_node))
 		return (1);
 	if (!*ph)

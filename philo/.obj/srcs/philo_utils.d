@@ -1,4 +1,4 @@
-.obj/./srcs/init_n_manage.o: srcs/init_n_manage.c philo.h \
+.obj/./srcs/philo_utils.o: srcs/philo_utils.c philo.h \
   /usr/include/pthread.h /usr/include/features.h \
   /usr/include/features-time64.h \
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \

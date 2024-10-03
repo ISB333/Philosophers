@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/30 16:26:29 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:25:47 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@
 # define STATE_MUTEX 0
 # define EAT_MUTEX 1
 # define PRINT_MUTEX 2
+# define SLEEP_MUTEX 2
 
 # define ALLOCATE 300
 # define FREE_MEMORY 301
@@ -61,17 +62,16 @@ typedef struct s_lock
 {
 	pid_t			pid;
 	int				is_dead;
-	long 			start_time;
 	int				nbr_of_philo;
 	pthread_mutex_t	m[3];
 	pthread_mutex_t	*forks;
-	struct timeval	current_time;
 }					t_lock;
 
 typedef struct s_philo
 {
 	pthread_t		philo;
 	long			dying_time;
+	long			start_time;
 	t_init			i;
 	t_lock			*l;
 	int				id;
@@ -91,12 +91,13 @@ int					thinking(t_philo *ph);
 int					is_he_dead(t_philo *ph);
 void				*unlocker(void **m);
 int					printer(t_philo *ph, char *s, int n, int token);
-long				get_time(struct timeval *current_time);
+long				get_time(void);
 int					is_num(char c);
 void				check_format(char *argv[]);
 int					is_he_dead(t_philo *ph);
 int					check_death(t_philo *ph);
-void				killer(t_philo *ph, int left);
+void				killer(t_philo *ph);
+void				ft_usleep(long long time);
 
 void				*mem_manager(size_t size, int token);
 int					ft_atoi(const char *nptr);

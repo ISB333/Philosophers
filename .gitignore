@@ -1,3 +1,4 @@
 *.o
 ./philo
 LazyPhilosophersTester/
+42-philosophers-tester/

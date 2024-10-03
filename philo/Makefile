@@ -6,14 +6,14 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/09/30 09:46:57 by adesille         ###   ########.fr        #
+#    Updated: 2024/10/03 13:19:02 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 ######################## ARGUMENTS ########################
 
 NAME = philo
-CFLAGS += -Wall -Wextra -MP -MD -g3 -I.
+CFLAGS += -Wall -Wextra -Werror -MP -MD -g3 -I.
 CC = cc 
 
 DEFAULT = \033[0;39m
@@ -24,7 +24,8 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = ./srcs/main.c ./srcs/init_n_manage.c ./srcs/activities.c ./srcs/verification.c
+SRCS = ./srcs/philo.c ./srcs/philo_utils.c ./srcs/init.c \
+		./srcs/activities.c ./srcs/verification.c
 
 UTILS =./srcs/utils/utils.c \
 	./srcs/utils/memory_manager.c ./srcs/utils/memory_manager_utils.c

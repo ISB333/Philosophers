@@ -1,28 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_n_manage.c                                    :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 10:11:38 by isb3              #+#    #+#             */
-/*   Updated: 2024/09/27 09:29:08 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:16:20 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
-
-void	unlinker(char *name[])
-{
-	while (*name)
-		sem_unlink(*name++);
-}
-
-void	closer(void *name[])
-{
-	while (*name)
-		sem_close(*name++);
-}
 
 int	opener(t_lock *l)
 {
@@ -49,8 +37,8 @@ void	parsing(t_init *i, char *argv[])
 	}
 	(*i).nbr_of_philo = n_philo;
 	(*i).true_dying_time = (long)ft_atoi(argv[2]);
-	(*i).eating_time = (long)ft_atoi(argv[3]) * 1000;
-	(*i).sleeping_time = (long)ft_atoi(argv[4]) * 1000;
+	(*i).eating_time = (long)ft_atoi(argv[3]);
+	(*i).sleeping_time = (long)ft_atoi(argv[4]);
 	if (argv[5])
 		(*i).eating_counter = ft_atoi(argv[5]);
 	else
@@ -67,8 +55,7 @@ int	init_philo(t_philo **ph, int id, t_init i, t_lock *l)
 	new_node->id = id;
 	new_node->i = i;
 	new_node->l = l;
-	new_node->dying_time = get_time(&new_node->l->current_time)
-		+ (new_node->i.true_dying_time);
+	new_node->dying_time = get_time() + new_node->i.true_dying_time;
 	if (!*ph)
 		*ph = new_node;
 	else

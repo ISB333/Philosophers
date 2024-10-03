@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 09:42:21 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:40:06 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:18:55 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,49 +14,64 @@
 
 int	sleeping(t_philo *ph)
 {
-	if (printer(ph, "is sleeping.", ph->id, SLEEP))
-		return (usleep(ph->i.sleeping_time), 1);
+	if (printer(ph, "is sleeping", ph->id, SLEEP))
+		return (ft_usleep(ph->i.sleeping_time), 1);
 	return (0);
 }
 
 int	thinking(t_philo *ph)
 {
-	if (printer(ph, "is thinking.", ph->id, THINK))
+	if (printer(ph, "is thinking", ph->id, THINK))
 		return (1);
 	return (0);
 }
 
-void	update_death_time(t_philo *ph, struct timeval *current_time)
+void	update_death_time(t_philo *ph)
 {
-	if (is_he_dead(ph))
-		return (sem_post(ph->l->forks), sem_post(ph->l->forks), (void)0);
 	sem_wait(ph->l->eat);
-	gettimeofday(current_time, NULL);
-	ph->dying_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
-			/ 1000) + (ph->i.true_dying_time);
+	if (check_death(ph))
+		return (sem_post(ph->l->forks), sem_post(ph->l->forks), (void)0);
+	ph->dying_time = get_time() - ph->start_time + ph->i.true_dying_time;
+	sem_post(ph->l->eat);
+	printer(ph, "is eating", ph->id, EAT);
+	ft_usleep(ph->i.eating_time);
 	if (ph->i.eating_counter != -1)
 		ph->i.eating_counter--;
-	printer(ph, "is eating.", ph->id, EAT);
-	usleep(ph->i.eating_time);
 	sem_post(ph->l->forks);
 	sem_post(ph->l->forks);
-	sem_post(ph->l->eat);
 }
 
-int	eating(t_philo *ph, struct timeval *current_time)
+int	eating(t_philo *ph)
 {
 	if (!is_he_dead(ph))
 	{
-		sem_wait(ph->l->forks);
-		printer(ph, "has taken left fork", ph->id, LEFT_FORK);
-		if (ph->l->nbr_of_philo != 1)
+		if (ph->l->nbr_of_philo == 1)
 		{
-			sem_wait(ph->l->forks);
-			printer(ph, "has taken right fork", ph->id, RIGHT_FORK);
-			update_death_time(ph, current_time);
+			printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+			return (killer(ph), 0);
+		}
+		if (ph->id % 2)
+		{
+			if(!is_he_dead(ph))
+			{
+				sem_wait(ph->l->forks);
+				sem_wait(ph->l->forks);
+				printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+				printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
+				update_death_time(ph);
+			}
 		}
 		else
-			sem_post(ph->l->forks);
+		{
+			if(!is_he_dead(ph))
+			{
+				sem_wait(ph->l->forks);
+				sem_wait(ph->l->forks);
+				printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+				printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
+				update_death_time(ph);
+			}
+		}
 		return (1);
 	}
 	return (0);
@@ -66,12 +81,10 @@ int	printer(t_philo *ph, char *s, int n, int token)
 {
 	long	precise_time;
 
-	if (is_he_dead(ph))
-		return (0);
 	sem_wait(ph->l->print);
-	gettimeofday(&ph->l->current_time, NULL);
-	precise_time = ((ph->l->current_time).tv_sec * 1000)
-		+ ((ph->l->current_time).tv_usec / 1000);
+	if (is_he_dead(ph))
+		return (sem_post(ph->l->print), 0);
+	precise_time = get_time() - ph->start_time;
 	if (s)
 	{
 		if (token == EAT)

@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:49:01 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:16:28 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-long	get_time(struct timeval *current_time)
-{
-	long	precise_time;
-
-	gettimeofday(current_time, NULL);
-	precise_time = ((*current_time).tv_sec * 1000) + ((*current_time).tv_usec
-			/ 1000);
-	return (precise_time);
-}
-
 void	*philo_diner_table(t_philo *ph)
-{
-	while (!is_he_dead(ph) && ph->i.eating_counter)
+{	
+	sem_wait(ph->l->eat);
+	ph->dying_time = get_time() - ph->start_time + ph->i.true_dying_time;
+	sem_post(ph->l->eat);
+	while (!check_death(ph) && ph->i.eating_counter)
 	{
-		if (check_death(ph) || !eating(ph, &ph->l->current_time))
+		if (!eating(ph))
 			return (NULL);
-		if (check_death(ph) || !thinking(ph))
+		if (!thinking(ph))
 			return (NULL);
-		if (check_death(ph) || !sleeping(ph))
+		if (!sleeping(ph))
 			return (NULL);
 	}
 	return (NULL);
@@ -40,6 +33,7 @@ void	execution(t_philo *ph, t_lock l)
 {
 	while (ph)
 	{
+		ph->start_time = get_time();
 		ph->pid = fork();
 		if (!ph->pid)
 		{

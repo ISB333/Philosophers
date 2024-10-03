@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:22 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:37:25 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 13:40:14 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ typedef struct s_init
 {
 	int				nbr_of_philo;
 	long			true_dying_time;
-	int				eating_time;
-	int				sleeping_time;
+	long			eating_time;
+	long			sleeping_time;
 	int				eating_counter;
 }					t_init;
 
@@ -76,6 +76,7 @@ typedef struct s_philo
 {
 	pid_t			pid;
 	long			dying_time;
+	long			start_time;
 	t_init			i;
 	t_lock			*l;
 	int				id;
@@ -86,7 +87,7 @@ typedef struct s_philo
 void				*philo_diner_table(t_philo *ph);
 int					init_philo(t_philo **ph, int id, t_init i, t_lock *l);
 void				parsing(t_init *i, char *argv[]);
-int					eating(t_philo *ph, struct timeval *current_time);
+int					eating(t_philo *ph);
 int					sleeping(t_philo *ph);
 int					thinking(t_philo *ph);
 int					is_he_dead(t_philo *ph);
@@ -94,11 +95,13 @@ int					opener(t_lock *l);
 void				closer(void *name[]);
 void				unlinker(char *name[]);
 int					printer(t_philo *ph, char *s, int n, int token);
-long				get_time(struct timeval *current_time);
+long				get_time(void);
 int					is_num(char c);
 void				check_format(char *argv[]);
 int					is_he_dead(t_philo *ph);
 int					check_death(t_philo *ph);
+void				ft_usleep(long long time);
+void				killer(t_philo *ph);
 
 void				*mem_manager(size_t size, int token);
 int					ft_atoi(const char *nptr);

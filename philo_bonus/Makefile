@@ -6,7 +6,7 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/09/27 09:19:22 by adesille         ###   ########.fr        #
+#    Updated: 2024/10/03 14:27:04 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,10 +24,11 @@ WHITE = \033[0;37m
 
 ######################## SOURCES ########################
 
-SRCS = ./srcs/main.c ./srcs/init_n_manage.c ./srcs/activities.c ./srcs/verification.c
+SRCS = ./srcs_bonus/philo_bonus.c ./srcs_bonus/philo_bonus_utils.c ./srcs_bonus/init.c \
+		./srcs_bonus/activities.c ./srcs_bonus/verification.c
 
-UTILS =./srcs/utils/utils.c \
-	./srcs/utils/memory_manager.c ./srcs/utils/memory_manager_utils.c
+UTILS =./srcs_bonus/utils/utils.c \
+	./srcs_bonus/utils/memory_manager.c ./srcs_bonus/utils/memory_manager_utils.c
 
 DEPFILES = $(SRCS:%c=$(OBJ_DIR)/%.o) \
 		$(UTILS:%c=$(OBJ_DIR)/%.o)

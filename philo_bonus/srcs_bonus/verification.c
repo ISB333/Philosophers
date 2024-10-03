@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/09/27 09:18:14 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 13:35:05 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ int	check_death(t_philo *ph)
 	long	precise_time;
 
 	sem_wait(ph->l->state);
-	precise_time = get_time(&ph->l->current_time);
-	if (precise_time >= ph->dying_time && !ph->l->is_dead)
+	precise_time = get_time() - ph->start_time;
+	if (precise_time > ph->dying_time && !ph->l->is_dead)
 	{
 		ph->l->is_dead = 1;
 		printf(RED "%ld %d died\n" DEF, precise_time, ph->id);

@@ -1,4 +1,4 @@
-.obj/./srcs/init_n_manage.o: srcs/init_n_manage.c philo_bonus.h \
+.obj/./srcs/philo_bonus_utils.o: srcs/philo_bonus_utils.c philo_bonus.h \
   /usr/include/fcntl.h /usr/include/features.h \
   /usr/include/features-time64.h \
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \

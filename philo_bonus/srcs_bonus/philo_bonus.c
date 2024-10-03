@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/03 14:16:28 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:41:24 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,18 @@ void	execution(t_philo *ph, t_lock l)
 		}
 		ph = ph->next;
 	}
-	int k = -1;
-	while (++k < l.nbr_of_philo)
-		waitpid(-1, NULL, 0);
+	// int k = -1;
+	// while (++k < l.nbr_of_philo)
+	int status = 0;
+	waitpid(-1, &status, 0);
+	if (WIFEXITED(status))
+	{
+		while(ph)
+		{
+			kill(ph->pid, SIGKILL);
+			ph = ph->next;
+		}
+	}
 	unlinker((char *[]){"/forks", "/state", "/eat", "print", NULL});
 	closer((void *[]){l.forks, l.state, l.eat, l.print, NULL});
 }

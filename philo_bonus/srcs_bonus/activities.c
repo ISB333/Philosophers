@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 09:42:21 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/03 14:18:55 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:35:16 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,37 +43,34 @@ void	update_death_time(t_philo *ph)
 
 int	eating(t_philo *ph)
 {
-	if (!is_he_dead(ph))
+	if (ph->l->nbr_of_philo == 1)
 	{
-		if (ph->l->nbr_of_philo == 1)
-		{
-			printer(ph, "has taken a fork", ph->id, LEFT_FORK);
-			return (killer(ph), 0);
-		}
-		if (ph->id % 2)
-		{
-			if(!is_he_dead(ph))
-			{
-				sem_wait(ph->l->forks);
-				sem_wait(ph->l->forks);
-				printer(ph, "has taken a fork", ph->id, LEFT_FORK);
-				printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
-				update_death_time(ph);
-			}
-		}
-		else
-		{
-			if(!is_he_dead(ph))
-			{
-				sem_wait(ph->l->forks);
-				sem_wait(ph->l->forks);
-				printer(ph, "has taken a fork", ph->id, LEFT_FORK);
-				printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
-				update_death_time(ph);
-			}
-		}
-		return (1);
+		printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+		return (killer(ph), 0);
 	}
+	if (ph->id % 2)
+	{
+		if(!is_he_dead(ph))
+		{
+			sem_wait(ph->l->forks);
+			sem_wait(ph->l->forks);
+			printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+			printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
+			update_death_time(ph);
+		}
+	}
+	else
+	{
+		if(!is_he_dead(ph))
+		{
+			sem_wait(ph->l->forks);
+			sem_wait(ph->l->forks);
+			printer(ph, "has taken a fork", ph->id, LEFT_FORK);
+			printer(ph, "has taken a fork", ph->id, RIGHT_FORK);
+			update_death_time(ph);
+		}
+	}
+	return (1);
 	return (0);
 }
 

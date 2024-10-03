@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/03 13:35:05 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/03 14:43:49 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ int	check_death(t_philo *ph)
 		ph->l->is_dead = 1;
 		printf(RED "%ld %d died\n" DEF, precise_time, ph->id);
 		sem_post(ph->l->state);
+		kill(ph->pid, SIGKILL);
 		return (1);
 	}
 	sem_post(ph->l->state);

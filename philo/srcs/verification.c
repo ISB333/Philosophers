@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/03 13:15:43 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:48:26 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ int	check_death(t_philo *ph)
 {
 	long	precise_time;
 
+	pthread_mutex_lock(&ph->l->m[PRINT_MUTEX]);
 	pthread_mutex_lock(&ph->l->m[STATE_MUTEX]);
 	precise_time = get_time() - ph->start_time;
 	if (precise_time > ph->dying_time && !ph->l->is_dead)
@@ -56,8 +57,10 @@ int	check_death(t_philo *ph)
 		ph->l->is_dead = 1;
 		printf(RED "%ld %d died\n" DEF, precise_time, ph->id);
 		pthread_mutex_unlock(&ph->l->m[STATE_MUTEX]);
+		pthread_mutex_unlock(&ph->l->m[PRINT_MUTEX]);
 		return (1);
 	}
 	pthread_mutex_unlock(&ph->l->m[STATE_MUTEX]);
+	pthread_mutex_unlock(&ph->l->m[PRINT_MUTEX]);
 	return (0);
 }

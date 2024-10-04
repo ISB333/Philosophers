@@ -1,26 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/03 13:13:19 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/04 09:41:24 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-long	get_time(void)
-{
-	struct timeval	current_time;
-	long			precise_time;
-
-	gettimeofday(&current_time, NULL);
-	precise_time = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
-	return (precise_time);
-}
 
 int	printer(t_philo *ph, char *s, int n, int token)
 {

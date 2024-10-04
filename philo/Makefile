@@ -6,7 +6,7 @@
 #    By: adesille <adesille@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/22 11:33:14 by adesille          #+#    #+#              #
-#    Updated: 2024/10/03 13:19:02 by adesille         ###   ########.fr        #
+#    Updated: 2024/10/04 09:52:27 by adesille         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,4 +61,4 @@ re : fclean all
 
 -include $(DEPFILES)
 
-.PHONY : all clean fclean re val git
+.PHONY : all clean fclean re

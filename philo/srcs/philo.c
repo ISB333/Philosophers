@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/04 09:41:24 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/04 12:32:38 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	main(int argc, char *argv[])
 			return (mem_manager(0, FREE_MEMORY), 1);
 	}
 	else
-		return (error("wrong number of arguments\n"), 1);
+		return (error("wrong number of arguments\n"), mem_manager(0, FREE_MEMORY), 1);
 	printf("-----------------------------\n\n");
 	return (mem_manager(0, FREE_MEMORY), 0);
 }

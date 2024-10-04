@@ -6,7 +6,7 @@
 /*   By: adesille <adesille@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 08:48:04 by adesille          #+#    #+#             */
-/*   Updated: 2024/10/04 09:48:26 by adesille         ###   ########.fr       */
+/*   Updated: 2024/10/04 12:33:06 by adesille         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	check_format(char *argv[])
 		k = -1;
 		while (argv[i][++k])
 			if (!is_num(argv[i][k]))
-				return (error("wrong format\n"), exit(EXIT_FAILURE));
+				return (error("wrong format\n"), mem_manager(0, FREE_MEMORY), exit(EXIT_FAILURE));
 	}
 }
 

@@ -93,7 +93,8 @@ int	main(int argc, char *argv[])
 			return (mem_manager(0, FREE_MEMORY), 1);
 	}
 	else
-		return (error("wrong number of arguments\n"), mem_manager(0, FREE_MEMORY), 1);
+		return (error("wrong number of arguments\n"),
+			mem_manager(0, FREE_MEMORY), 1);
 	printf("-----------------------------\n\n");
 	return (mem_manager(0, FREE_MEMORY), 0);
 }

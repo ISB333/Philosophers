@@ -31,7 +31,8 @@ void	check_format(char *argv[])
 		k = -1;
 		while (argv[i][++k])
 			if (!is_num(argv[i][k]))
-				return (error("wrong format\n"), mem_manager(0, FREE_MEMORY), exit(EXIT_FAILURE));
+				return (error("wrong format\n"), mem_manager(0, FREE_MEMORY),
+					exit(EXIT_FAILURE));
 	}
 }
 
